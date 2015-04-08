@@ -4,7 +4,6 @@ from django.test import TestCase, RequestFactory, override_settings
 from bread.bread import Bread
 from bread.models import BreadTestModel
 from bread.tests.factories import BreadTestModelFactory
-from libya_site.tests.factories import UserFactory
 
 # Set urlpatterns for a test by calling .set_urls()
 urlpatterns = None
