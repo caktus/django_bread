@@ -1,0 +1,12 @@
+{% extends base_template %}
+{% load i18n libya_tags %}
+
+{% block title %}{% blocktrans with names=view.plural_name %}Browse {{ names }}{% endblocktrans %}{% endblock title %}
+
+{% block content %}
+
+ <div>
+   {% include 'bread/includes/browse.html' %}
+
+ </div>
+{% endblock content %}
