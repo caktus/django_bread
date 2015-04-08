@@ -1,5 +1,4 @@
-{% load i18n libya_tags %}
-
+{% load i18n bread_tags %}
 {% if is_paginated %}
    {% if first_url %}<a href="{{ first_url }}">[{% trans "First" %}]</a>{% endif %}
    {% if previous_url %}<a href="{{ previous_url }}">[{% trans "Previous" %}]</a>{% endif %}
@@ -10,7 +9,7 @@
    {% if last_url %}<a href="{{ last_url }}">[{% trans "Last" %}]</a>{% endif %}
 {% endif %}
 
- {% if filter.form %}
+ {% if filter and filter.form %}
    <form method="GET">
        {% if filter.form.non_field_errors %}
          <div class="control-group">

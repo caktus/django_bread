@@ -1,7 +1,7 @@
 from httplib import FOUND, OK
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from bread.tests.base import BreadTestCase
+from .base import BreadTestCase
 
 
 class BreadDeleteTest(BreadTestCase):

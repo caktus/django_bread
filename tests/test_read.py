@@ -2,7 +2,7 @@ from httplib import OK, METHOD_NOT_ALLOWED
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
-from bread.tests.base import BreadTestCase
+from .base import BreadTestCase
 
 
 class BreadReadTest(BreadTestCase):

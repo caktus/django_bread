@@ -1,16 +1,18 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, RequestFactory, override_settings
+
 from bread.bread import Bread
-from bread.models import BreadTestModel
-from bread.tests.factories import BreadTestModelFactory
-from libya_site.tests.factories import UserFactory
+
+from .models import BreadTestModel
+from .factories import BreadTestModelFactory
 
 # Set urlpatterns for a test by calling .set_urls()
 urlpatterns = None
 
 
-@override_settings(ROOT_URLCONF='bread.tests.base',
+@override_settings(ROOT_URLCONF='tests.base',
                    BREAD={'DEFAULT_BASE_TEMPLATE': 'bread/empty.html',
                           'DEFAULT_TEMPLATE_NAME_PATTERN': None})
 class BreadTestCase(TestCase):
@@ -19,7 +21,8 @@ class BreadTestCase(TestCase):
     def setUp(self):
         self.username = 'joe'
         self.password = 'random'
-        self.user = UserFactory(username=self.username)
+        User = get_user_model()
+        self.user = User.objects.create_user(username=self.username)
         self.user.set_password(self.password)
         self.user.save()
         assert self.client.login(username=self.username, password=self.password)

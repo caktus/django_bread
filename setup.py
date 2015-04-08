@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django_bread',
-    version='0.0.1',
+    version='0.0.2',
     packages=find_packages(),
     url='https://github.com/caktus/django_bread',
     license='APL2',
@@ -13,8 +13,11 @@ setup(
     install_requires=[
         'django-filter>=0.9.2,<1.0',
         'django-vanilla-views>=1.0.3,<2.0',
-        'django>=1.7.7',  # Should we require this explicitly?
     ],
+    # test_requires=[
+    #     'django>=1.7.7',  # Should we require this explicitly?
+    #     'factory_boy==2.3.1',
+    # ],
     long_description=open('README.rst').read(),
     classifiers=[
         # FIXME: Add Django here

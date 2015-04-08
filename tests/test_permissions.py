@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.test import override_settings
-from bread.tests.base import BreadTestCase
+from .base import BreadTestCase
 
 
 class BreadPermissionTestMixin(object):
