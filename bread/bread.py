@@ -153,10 +153,18 @@ class BreadViewMixin(object):
         return data
 
     def get_form(self, data=None, files=None, **kwargs):
+        # FIXME: this probably needs to be refactored and simplified.
+        # It's complicated by Django now insisting on being passed either
+        # fields or excludes, but maybe we should just override that.
         exclude = kwargs.pop('exclude', [])
         if self.bread.exclude:
             exclude.extend(self.bread.exclude)
-        form_class = self.get_form_class()
+        if self.form_class:
+            form_class = self.form_class
+        else:
+            form_class = modelform_factory(
+                self.bread.model,
+                exclude=exclude)
         if exclude:
             form_class = modelform_factory(
                 self.bread.model,

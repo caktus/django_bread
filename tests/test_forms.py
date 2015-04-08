@@ -4,8 +4,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from bread.bread import Bread
-from bread.models import BreadTestModel
-from bread.tests.base import BreadTestCase
+from .models import BreadTestModel
+from .base import BreadTestCase
 
 
 class TestForm(forms.ModelForm):

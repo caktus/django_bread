@@ -1,7 +1,7 @@
 from httplib import OK, METHOD_NOT_ALLOWED
 from django.core.urlresolvers import reverse
-from bread.tests.base import BreadTestCase
-from bread.tests.factories import BreadTestModelFactory
+from .base import BreadTestCase
+from .factories import BreadTestModelFactory
 
 
 class BreadBrowseTest(BreadTestCase):

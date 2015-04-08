@@ -1,7 +1,7 @@
 import factory
 import factory.fuzzy
 
-from bread.models import BreadTestModel
+from .models import BreadTestModel
 
 
 class BreadTestModelFactory(factory.DjangoModelFactory):

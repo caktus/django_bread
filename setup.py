@@ -13,7 +13,10 @@ setup(
     install_requires=[
         'django-filter>=0.9.2,<1.0',
         'django-vanilla-views>=1.0.3,<2.0',
+    ],
+    test_requires=[
         'django>=1.7.7',  # Should we require this explicitly?
+        'factory_boy==2.3.1',
     ],
     long_description=open('README.rst').read(),
     classifiers=[

@@ -1,5 +1,5 @@
 from bread.bread import Bread
-from bread.tests.base import BreadTestCase
+from .base import BreadTestCase
 
 
 class BreadURLsNamespaceTest(BreadTestCase):
