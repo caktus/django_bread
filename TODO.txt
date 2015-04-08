@@ -1,7 +1,0 @@
-TODOs
-
-* Move these TODOs to GitHub issues once this is in GitHub
-* Get standalone tests working
-* Write proper documentation
-* Add sorting by columns
-* Figure out if the current template scheme is usable or what would be better
