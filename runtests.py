@@ -1,16 +1,47 @@
 #!/usr/bin/env python
-# See https://docs.djangoproject.com/en/1.7/topics/testing/advanced/#using-the-django-test-runner-to-test-reusable-applications
 import os
 import sys
 
-import django
 from django.conf import settings
+
+
+if not settings.configured:
+    settings.configure(
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
+            }
+        },
+        MIDDLEWARE_CLASSES=(),
+        INSTALLED_APPS=(
+            'bread',
+            'tests',
+            "django.contrib.auth",
+            "django.contrib.contenttypes",
+            'django.contrib.sessions',
+        ),
+        SITE_ID=1,
+        SECRET_KEY='super-secret',
+        # ROOT_URLCONF='selectable.tests.urls',
+        TEMPLATE_DIRS = [
+            'bread/templates',
+        ],
+    )
+
+
+from django import setup
 from django.test.utils import get_runner
 
-if __name__ == "__main__":
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
-    django.setup()
+
+def runtests():
+    setup()
     TestRunner = get_runner(settings)
-    test_runner = TestRunner()
-    failures = test_runner.run_tests(["tests"])
-    sys.exit(bool(failures))
+    test_runner = TestRunner(verbosity=2, interactive=True, failfast=False)
+    args = sys.argv[1:] or []
+    failures = test_runner.run_tests(args)
+    sys.exit(failures)
+
+
+if __name__ == '__main__':
+    runtests()

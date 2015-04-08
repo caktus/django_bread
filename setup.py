@@ -15,13 +15,8 @@ setup(
         'django-filter>=0.9.2,<1.0',
         'django-vanilla-views>=1.0.3,<2.0',
     ],
-    # test_requires=[
-    #     'django>=1.7.7',  # Should we require this explicitly?
-    #     'factory_boy==2.3.1',
-    # ],
     long_description=open('README.rst').read(),
     classifiers=[
-        # FIXME: Add Django here
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
@@ -30,7 +25,15 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
-        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Framework :: Django :: 1.7',
+        'Framework :: Django :: 1.8',
     ],
     zip_safe=False, # because we're including media that Django needs
+
+    # Test
+    test_suite="runtests.runtests",
+    tests_require=[
+        'factory_boy==2.3.1',
+    ]
 )
