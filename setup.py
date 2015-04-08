@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='django_bread',
-    version='0.0.3',
+    version='0.0.4',
     packages=['bread'],
     url='https://github.com/caktus/django_bread',
     license='APL2',
