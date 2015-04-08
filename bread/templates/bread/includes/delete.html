@@ -1,0 +1,11 @@
+{% load i18n %}
+
+{% blocktrans with name=view.object %}Really delete {{ name }}?{% endblocktrans %}
+<form method="POST">
+  {% csrf_token %}
+  <br/>
+  <input type="submit">
+</form>
+<br/>
+<a href="{% url bread.browse_url_name %}">{% trans "Back to list" %}</a>
+

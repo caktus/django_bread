@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<form method="POST">
+  {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="control-group">
+        {% for err in form.non_field_errors %}
+          <div class="alert alert-error help-block">
+            {{ err }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <br/>
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.errors %}
+        <div class="alert alert-error help-block">
+          {{ field.errors }}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <br/>
+    <input class="half" type="submit" value="Submit">
+  </form>
+  <a href="{% url bread.browse_url_name %}">{% trans "Back to list" %}</a>
