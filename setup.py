@@ -1,10 +1,10 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 setup(
     name='django_bread',
-    version='0.0.2',
-    packages=find_packages(),
+    version='0.0.3',
+    packages=['bread'],
     url='https://github.com/caktus/django_bread',
     license='APL2',
     author='Dan Poirier',
