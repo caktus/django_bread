@@ -9,7 +9,7 @@
    {% if last_url %}<a href="{{ last_url }}">[{% trans "Last" %}]</a>{% endif %}
 {% endif %}
 
- {% if filter and filter.form %}
+ {% if filter != None and filter.form != None %}
    <form method="GET">
        {% if filter.form.non_field_errors %}
          <div class="control-group">
