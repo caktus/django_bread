@@ -1,5 +1,11 @@
-from httplib import BAD_REQUEST
-from urllib import urlencode
+try:
+    # Python 2
+    from httplib import BAD_REQUEST
+    from urllib import urlencode
+except ImportError:
+    # Python 3
+    from http.client import BAD_REQUEST
+    from urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls import url
@@ -153,24 +159,13 @@ class BreadViewMixin(object):
         return data
 
     def get_form(self, data=None, files=None, **kwargs):
-        # FIXME: this probably needs to be refactored and simplified.
-        # It's complicated by Django now insisting on being passed either
-        # fields or excludes, but maybe we should just override that.
-        exclude = kwargs.pop('exclude', [])
-        if self.bread.exclude:
-            exclude.extend(self.bread.exclude)
-        if self.form_class:
-            form_class = self.form_class
-        else:
-            form_class = modelform_factory(
+        if not self.form_class:
+            self.form_class = modelform_factory(
                 self.bread.model,
-                exclude=exclude)
-        if exclude:
-            form_class = modelform_factory(
-                self.bread.model,
-                form=form_class,
-                exclude=exclude)
-        return form_class(data=data, files=files, **kwargs)
+                fields='__all__',
+                exclude=self.exclude
+            )
+        return self.form_class(data=data, files=files, **kwargs)
 
     @property
     def success_url(self):
@@ -340,6 +335,11 @@ class Bread(object):
                  template_name_pattern=None,
                  url_namespace='',
                  ):
+        if exclude is not None and form_class is not None:
+            raise ImproperlyConfigured(
+                "exclude and form_class are mutually exclusive - if you're overrding the form, "
+                "just specify the excluded fields there."
+            )
         self.model = model
         self.name = self.model._meta.object_name.lower()
         self.plural_name = plural_name or self.name + 's'

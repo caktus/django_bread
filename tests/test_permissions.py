@@ -1,4 +1,7 @@
-from httplib import FOUND
+try:
+    from httplib import FOUND
+except ImportError:
+    from http.client import FOUND
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import AnonymousUser

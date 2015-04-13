@@ -9,9 +9,12 @@ If Django ever gets this sorted out, we can move this model
 to the tests, and maybe get fancier with different test models
 for different tests.
 """
+from __future__ import unicode_literals
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
 
@@ -22,5 +25,5 @@ class BreadTestModel(models.Model):
             ('browse_breadtestmodel', 'can browse BreadTestModel'),
         ]
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

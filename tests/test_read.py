@@ -1,4 +1,8 @@
-from httplib import OK, METHOD_NOT_ALLOWED
+try:
+    from httplib import OK, METHOD_NOT_ALLOWED
+except ImportError:
+    from http.client  import OK, METHOD_NOT_ALLOWED
+
 from django.core.urlresolvers import reverse
 from django.http import Http404
 
