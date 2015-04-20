@@ -18,6 +18,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from .utils import unlistify_dict_values
+
 
 """
 About settings.
@@ -118,7 +120,7 @@ class BreadViewMixin(object):
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified
         query parms updated or added"""
-        request_kwargs = dict(self.request.GET)
+        request_kwargs = unlistify_dict_values(self.request.GET)
         request_kwargs.update(query_parms)
         return self.request.path + "?" + urlencode(request_kwargs)
 
@@ -163,7 +165,7 @@ class BreadViewMixin(object):
             self.form_class = modelform_factory(
                 self.bread.model,
                 fields='__all__',
-                exclude=self.exclude
+                exclude=self.bread.exclude
             )
         return self.form_class(data=data, files=files, **kwargs)
 

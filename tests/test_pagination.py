@@ -80,3 +80,20 @@ class BreadPaginationTest(BreadTestCase):
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
         self.assertEqual(METHOD_NOT_ALLOWED, rsp.status_code)
+
+    def test_next_url(self):
+        # Make sure next_url includes other query params unaltered
+        self.set_urls(self.bread)
+        self.give_permission('browse')
+        base_url = reverse(self.bread.get_url_name('browse'))
+        # Add a query parm that needs to be preserved by the next page link
+        url = base_url + "?test=1"
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertEqual(OK, rsp.status_code)
+        context = rsp.context_data
+        next_url = context['next_url']
+        # We don't know what order the query parms will end up in
+        expected_urls = [base_url + "?test=1&page=2", base_url + "?page=2&test=1"]
+        self.assertIn(next_url, expected_urls)
