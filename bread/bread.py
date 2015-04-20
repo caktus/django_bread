@@ -163,7 +163,7 @@ class BreadViewMixin(object):
             self.form_class = modelform_factory(
                 self.bread.model,
                 fields='__all__',
-                exclude=self.exclude
+                exclude=self.bread.exclude
             )
         return self.form_class(data=data, files=files, **kwargs)
 
