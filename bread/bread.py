@@ -163,7 +163,7 @@ class BreadViewMixin(object):
             self.form_class = modelform_factory(
                 self.bread.model,
                 fields='__all__',
-                exclude=self.exclude
+                exclude=self.bread.exclude
             )
         return self.form_class(data=data, files=files, **kwargs)
 
@@ -463,31 +463,31 @@ class Bread(object):
         urlpatterns = []
         if 'B' in self.views:
             urlpatterns.append(
-                url(r'%s/$' % self.plural_name,
+                url(r'^%s/$' % self.plural_name,
                     self.get_browse_view(),
                     name=self.browse_url_name(include_namespace=False)))
 
         if 'R' in self.views:
             urlpatterns.append(
-                url(r'%s/(?P<pk>\d+)/$' % self.plural_name,
+                url(r'^%s/(?P<pk>\d+)/$' % self.plural_name,
                     self.get_read_view(),
                     name=self.read_url_name(include_namespace=False)))
 
         if 'E' in self.views:
             urlpatterns.append(
-                url(r'%s/(?P<pk>\d+)/edit/$' % self.plural_name,
+                url(r'^%s/(?P<pk>\d+)/edit/$' % self.plural_name,
                     self.get_edit_view(),
                     name=self.edit_url_name(include_namespace=False)))
 
         if 'A' in self.views:
             urlpatterns.append(
-                url(r'%s/add/$' % self.plural_name,
+                url(r'^%s/add/$' % self.plural_name,
                     self.get_add_view(),
                     name=self.add_url_name(include_namespace=False)))
 
         if 'D' in self.views:
             urlpatterns.append(
-                url(r'%s/(?P<pk>\d+)/delete/$' % self.plural_name,
+                url(r'^%s/(?P<pk>\d+)/delete/$' % self.plural_name,
                     self.get_delete_view(),
                     name=self.delete_url_name(include_namespace=False)))
         return urlpatterns
