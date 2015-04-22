@@ -120,7 +120,7 @@ class BreadViewMixin(object):
         query parms updated or added"""
         request_kwargs = dict(self.request.GET)
         request_kwargs.update(query_parms)
-        return self.request.path + "?" + urlencode(request_kwargs)
+        return self.request.path + "?" + urlencode(request_kwargs, doseq=True)
 
     def get_context_data(self, **kwargs):
         data = super(BreadViewMixin, self).get_context_data(**kwargs)
