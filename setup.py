@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
-
+from bread import VERSION
 
 setup(
     name='django_bread',
-    version='0.0.8',
+    version=VERSION,
     packages=find_packages(),
     url='https://github.com/caktus/django_bread',
     license='APL2',
