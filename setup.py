@@ -29,11 +29,5 @@ setup(
         'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
     ],
-    zip_safe=False, # because we're including media that Django needs
-
-    # Test
-    test_suite="runtests.runtests",
-    tests_require=[
-        'factory_boy==2.3.1',
-    ]
+    zip_safe=False,  # because we're including media that Django needs
 )
