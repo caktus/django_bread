@@ -40,20 +40,20 @@ class BreadURLsNamespaceTest(BreadTestCase):
             x for x in patterns
             if x.name == bread.browse_url_name(include_namespace=False)
         ][0].regex.pattern
-        self.assertEqual('%ss/$' % self.model_name, browse_pattern)
+        self.assertEqual('^%ss/$' % self.model_name, browse_pattern)
 
         read_pattern = [
             x for x in patterns
             if x.name == bread.read_url_name(include_namespace=False)
         ][0].regex.pattern
-        self.assertTrue(read_pattern.startswith('%ss/' % self.model_name))
+        self.assertTrue(read_pattern.startswith('^%ss/' % self.model_name))
         self.assertIn('(?P<pk>', read_pattern)
 
         edit_pattern = [
             x for x in patterns
             if x.name == bread.edit_url_name(include_namespace=False)
         ][0].regex.pattern
-        self.assertTrue(edit_pattern.startswith('%ss/' % self.model_name))
+        self.assertTrue(edit_pattern.startswith('^%ss/' % self.model_name))
         self.assertIn('(?P<pk>', edit_pattern)
         self.assertTrue(edit_pattern.endswith('/edit/$'))
 
@@ -75,14 +75,14 @@ class BreadURLsTest(BreadTestCase):
         )
 
         browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][0].regex.pattern
-        self.assertEqual('%ss/$' % self.model_name, browse_pattern)
+        self.assertEqual('^%ss/$' % self.model_name, browse_pattern)
 
         read_pattern = [x for x in patterns if x.name == bread.read_url_name()][0].regex.pattern
-        self.assertTrue(read_pattern.startswith('%ss/' % self.model_name))
+        self.assertTrue(read_pattern.startswith('^%ss/' % self.model_name))
         self.assertIn('(?P<pk>', read_pattern)
 
         edit_pattern = [x for x in patterns if x.name == bread.edit_url_name()][0].regex.pattern
-        self.assertTrue(edit_pattern.startswith('%ss/' % self.model_name))
+        self.assertTrue(edit_pattern.startswith('^%ss/' % self.model_name))
         self.assertIn('(?P<pk>', edit_pattern)
         self.assertTrue(edit_pattern.endswith('/edit/$'))
 
