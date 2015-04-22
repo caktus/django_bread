@@ -6,3 +6,5 @@ install:
   - "pip install tox"
 # command to run tests
 script: tox
+# Adding sudo: False tells Travis to use their container-based infrastructure, which is somewhat faster.
+sudo: False
