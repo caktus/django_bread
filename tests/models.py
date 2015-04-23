@@ -14,9 +14,14 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
+class BreadTestModel2(models.Model):
+    text = models.CharField(max_length=20)
+
+
 @python_2_unicode_compatible
 class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
+    other = models.ForeignKey(BreadTestModel2, blank=True, null=True)
 
     class Meta:
         ordering = ['name']
