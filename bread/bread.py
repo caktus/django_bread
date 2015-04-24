@@ -18,6 +18,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
+from .utils import validate_fieldspec
+
 
 """
 About settings.
@@ -360,37 +362,8 @@ class Bread(object):
         self.url_namespace = url_namespace
 
         if self.columns:
-            self.validate_columns()
-
-    def validate_columns(self):
-        for title, column in self.columns:
-            self.validate_column(column)
-
-    def validate_column(self, column, model=None):
-        """
-        A column specifier can be a simple name, which should refer to a field
-        on the model, or can have multiple parts separated by '__', in which case
-        the first part must be the name of a field that is a ForeignKey or other kind
-        of field that refers to another model. Then the next part of the column
-        specifier must be a field name on that model, and so on.
-
-        Raises a FieldDoesNotExist or AssertionError if there's anything noticed
-        that is not correct.
-        """
-        model = model or self.model
-        parts = column.split('__', 1)
-        field = model._meta.get_field(parts[0])
-        if len(parts) == 1:
-            # Simple attrname
-            return
-        # Field must refer to another model
-        assert field.rel, \
-            "field '%s' on model %s is not a reference to another model, but the columns " \
-            "specifier '%s' requires it to be" % (parts[0], model, column)
-
-        # Ensure the rest of the column attribute specifier
-        # is valid against *that* model.
-        self.validate_column(column=parts[1], model=field.rel.to)
+            for title, column in self.columns:
+                validate_fieldspec(self.model, column)
 
     #####
     # B #

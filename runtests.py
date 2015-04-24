@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import logging
 import os
 import sys
 
@@ -35,6 +36,10 @@ from django.test.utils import get_runner
 
 
 def runtests():
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.StreamHandler())
+
     setup()
     TestRunner = get_runner(settings)
     test_runner = TestRunner(verbosity=2, interactive=True, failfast=False)
