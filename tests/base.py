@@ -31,7 +31,12 @@ class BreadTestCase(TestCase):
         self.model_factory = BreadTestModelFactory
         self.request_factory = RequestFactory()
         self.bread = Bread(model=self.model, base_template='bread/empty.html',
-                           url_namespace=self.url_namespace)
+                           url_namespace=self.url_namespace,
+                           columns=[
+                               ('Name', 'name'),
+                               ('Text', 'other__text'),
+                           ]
+                           )
 
     def tearDown(self):
         global urlpatterns

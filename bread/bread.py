@@ -15,8 +15,11 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Model
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
+
+from .utils import validate_fieldspec
 
 
 """
@@ -358,6 +361,14 @@ class Bread(object):
         self.template_name_pattern = (template_name_pattern
                                       or setting('DEFAULT_TEMPLATE_NAME_PATTERN', None))
         self.url_namespace = url_namespace
+
+        if not issubclass(self.model, Model):
+            raise TypeError("'model' argument for Bread must be a "
+                            "subclass of Model; it is %r" % model)
+
+        if self.columns:
+            for title, column in self.columns:
+                validate_fieldspec(self.model, column)
 
     #####
     # B #
