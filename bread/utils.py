@@ -29,6 +29,7 @@ value, similar to how references to context variables in templates
 work.
 """
 from inspect import getargspec
+
 from django.core.exceptions import ValidationError
 from django.db.models import Model
 from django.db.models.fields import FieldDoesNotExist
@@ -84,7 +85,9 @@ def validate_fieldspec(model, spec):
 
     Otherwise just returns.
     """
-    assert issubclass(model, Model)
+    if not issubclass(model, Model):
+        raise TypeError("First argument to validate_fieldspec must be a "
+                        "subclass of Model; it is %r" % model)
     parts = spec.split('__', 1)
     rest_of_spec = parts[1] if len(parts) > 1 else None
 
