@@ -6,7 +6,6 @@ except ImportError:
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from bread.bread import Bread
 from .models import BreadTestModel
 from .base import BreadTestCase
 
@@ -26,9 +25,12 @@ class TestForm(forms.ModelForm):
 
 
 class BreadFormAddTest(BreadTestCase):
+    extra_bread_attributes = {
+        'form_class': TestForm,
+    }
+
     def setUp(self):
         super(BreadFormAddTest, self).setUp()
-        self.bread = Bread(model=self.model, base_template='bread/empty.html', form_class=TestForm)
         self.set_urls(self.bread)
 
     def test_new_item(self):
@@ -75,9 +77,12 @@ class BreadFormAddTest(BreadTestCase):
 
 
 class BreadFormEditTest(BreadTestCase):
+    extra_bread_attributes = {
+        'form_class': TestForm,
+    }
+
     def setUp(self):
         super(BreadFormEditTest, self).setUp()
-        self.bread = Bread(model=self.model, base_template='bread/empty.html', form_class=TestForm)
         self.set_urls(self.bread)
 
     def test_edit_item(self):
@@ -127,9 +132,12 @@ class BreadFormEditTest(BreadTestCase):
 
 class BreadExcludeTest(BreadTestCase):
     # We can exclude a field from the default form
+    extra_bread_attributes = {
+        'exclude': ['id']
+    }
+
     def setUp(self):
         super(BreadExcludeTest, self).setUp()
-        self.bread = Bread(model=self.model, base_template='bread/empty.html', exclude=['id'])
         self.set_urls(self.bread)
 
     def test_get(self):

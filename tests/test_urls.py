@@ -1,4 +1,3 @@
-from bread.bread import Bread
 from .base import BreadTestCase
 
 
@@ -88,16 +87,16 @@ class BreadURLsTest(BreadTestCase):
 
     def test_view_subset(self):
         # We can do bread with a subset of the BREAD views
-        bread = Bread(model=self.model, views='B')
-        url_names = [x.name for x in bread.get_urls()]
+        self.bread.views = 'B'
+        url_names = [x.name for x in self.bread.get_urls()]
         self.assertIn('browse_%ss' % self.model_name, url_names)
         self.assertNotIn('read_%s' % self.model_name, url_names)
         self.assertNotIn('edit_%s' % self.model_name, url_names)
         self.assertNotIn('add_%s' % self.model_name, url_names)
         self.assertNotIn('delete_%s' % self.model_name, url_names)
 
-        bread = Bread(model=self.model, views='RE')
-        url_names = [x.name for x in bread.get_urls()]
+        self.bread.views = 'RE'
+        url_names = [x.name for x in self.bread.get_urls()]
         self.assertNotIn('browse_%ss' % self.model_name, url_names)
         self.assertIn('read_%s' % self.model_name, url_names)
         self.assertIn('edit_%s' % self.model_name, url_names)
