@@ -129,6 +129,7 @@ class BreadViewMixin(object):
         data = super(BreadViewMixin, self).get_context_data(**kwargs)
         # Include reference to the Bread object in template contexts
         data['bread'] = self.bread
+        data['model_meta'] = self.model._meta
         data['columns'] = self.bread.columns
         if data.get('is_paginated', False):
             page = data['page_obj']
