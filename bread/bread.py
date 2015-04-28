@@ -106,17 +106,19 @@ class BreadViewMixin(object):
         return self.bread.paginate_by
 
     def get_template_names(self):
-        # Is there a template_name_pattern?
+        # Return Django Vanilla templates (app-specific), then
+        #        Customized templates (via Bread object or Django settings), then
+        #        Django Bread templates
+        vanilla_templates = super(BreadViewMixin, self).get_template_names()
+        default_templates = ['bread/%s.html' % self.template_name_suffix]
         if self.bread.template_name_pattern:
-            return [self.bread.template_name_pattern.format(
+            custom_templates = [self.bread.template_name_pattern.format(
                 app_label=self.bread.model._meta.app_label,
                 model=self.bread.model._meta.object_name.lower(),
                 view=self.template_name_suffix
             )]
-        # First try the default names for Django Vanilla views, then
-        # add on 'bread/<viewname>.html' as a final possibility.
-        return (super(BreadViewMixin, self).get_template_names()
-                + ['bread/%s.html' % self.template_name_suffix])
+            return (vanilla_templates + custom_templates + default_templates)
+        return (vanilla_templates + default_templates)
 
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified
@@ -293,11 +295,11 @@ class Bread(object):
 
     Assumes templates with the following names:
 
-        Browse - <app>/<name>_browse.html
-        Read   - <app>/<name>_read.html
-        Edit   - <app>/<name>_edit.html
-        Add    - <app>/<name>_add.html
-        Delete - <app>/<name>_confirm_delete.html
+        Browse - <app>/<name>browse.html
+        Read   - <app>/<name>read.html
+        Edit   - <app>/<name>edit.html
+        Add    - <app>/<name>add.html
+        Delete - <app>/<name>delete.html
 
     but defaults to bread/<activity>.html if those aren't found.  The bread/<activity>.html
     templates are very generic, but you can pass 'base_template' as the name of a template
