@@ -9,13 +9,13 @@ one and adding it to your URL config.
 
 The main class to subclass is ``Bread``::
 
-    class UserBreadView(Bread):
+    class MyBreadView(Bread):
         attrib1 = something
         attrib2 = somethingelse
 
 then you can add it to a URL config something like this::
 
-    url(r'^', include(UserBreadView().get_urls())),
+    url(r'^', include(MyBreadView().get_urls())),
 
 See also :ref:`urls`.
 
@@ -34,8 +34,12 @@ model (required)
 
 exclude
     A list of names of fields to always exclude from any form classes that
-    Bread generates itself (but not applied to any form classes that you
-    provide).
+    Bread generates itself. (Not used for any views that have a custom form
+    class provided.)
+
+form_class
+    A model form class that Bread should use instead of generating one
+    itself. Can also be overridden on individual views that use forms.
 
 name
     A string to use in url names, permissions, etc. Defaults to the model's
@@ -46,9 +50,6 @@ plural_name
     A string to use as the plural name where needed (see ``name``, :ref:`urls`,
     and :ref:`templates`).
     Default: the name with an ``s`` appended.
-
-form_class
-    override the custom form class we're using for this model
 
 namespace
     A string with the URL namespace to include in the generated URLS.
@@ -61,7 +62,7 @@ views
 
 Example::
 
-    class UserBreadView(Bread):
+    class MyBreadView(Bread):
         model = MyModel
         form_class = MyModelForm
         views = 'BRD'
@@ -95,7 +96,7 @@ Example::
         param1 = value1
         param2 = value2
 
-    class UserBreadView(Bread):
+    class MyBreadView(Bread):
         attrib1 = something
         attrib2 = somethingelse
         browse_view = MyBrowseView
@@ -140,3 +141,53 @@ filterset
 paginate_by
     Limit browsing to this many items per page, and add controls
     to navigate among pages.
+
+Read view configuration
+-----------------------
+
+Subclass `bread.ReadView` and set these parameters.
+
+ReadView itself is a subclass of Vanilla's DetailView.
+
+exclude
+    A list of names of fields to always exclude from any form classes that
+    Bread generates itself. Not used in this view if a custom form class
+    is provided.  If specified, replaces `exclude` from the `BreadView`
+    subclass.
+
+form_class
+    specify a custom form class to use for this model in this view
+
+Edit view configuration
+-----------------------
+
+Subclass `bread.EditView` and set these parameters.
+
+EditView itself is a subclass of Vanilla's UpdateView.
+
+exclude
+    A list of names of fields to always exclude from any form classes that
+    Bread generates itself. Not used in this view if a custom form class
+    is provided.  If specified, replaces `exclude` from the `BreadView`
+    subclass.
+
+form_class
+    specify a custom form class to use for this model in this view
+
+
+Add view configuration
+----------------------
+
+Subclass `bread.AddView` and set these parameters.
+
+AddView itself is a subclass of Vanilla's CreateView.
+
+exclude
+    A list of names of fields to always exclude from any form classes that
+    Bread generates itself. Not used in this view if a custom form class
+    is provided.  If specified, replaces `exclude` from the `BreadView`
+    subclass.
+
+form_class
+    specify a custom form class to use for this model in this view
+

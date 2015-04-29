@@ -45,6 +45,9 @@ class BreadViewMixin(object):
     """We mix this into all the views for some common features"""
     bread = None  # The Bread object using this view
 
+    exclude = None
+    form_class = None
+
     # Make this view require the appropriate permission
     @property
     def permission_required(self):
@@ -145,13 +148,14 @@ class BreadViewMixin(object):
         return data
 
     def get_form(self, data=None, files=None, **kwargs):
-        if not self.form_class:
-            self.form_class = modelform_factory(
+        form_class = self.form_class or self.bread.form_class
+        if not form_class:
+            form_class = modelform_factory(
                 self.bread.model,
                 fields='__all__',
-                exclude=self.bread.exclude
+                exclude=self.exclude or self.bread.exclude
             )
-        return self.form_class(data=data, files=files, **kwargs)
+        return form_class(data=data, files=files, **kwargs)
 
     @property
     def success_url(self):
@@ -297,9 +301,9 @@ class Bread(object):
     views = "BREAD"
     base_template = setting('DEFAULT_BASE_TEMPLATE', 'base.html')
     namespace = ''
-    form_class = None
     template_name_pattern = setting('DEFAULT_TEMPLATE_NAME_PATTERN', None)
     plural_name = None
+    form_class = None
 
     def __init__(self):
         self.name = self.model._meta.object_name.lower()
@@ -315,6 +319,16 @@ class Bread(object):
         if self.browse_view.columns:
             for title, column in self.browse_view.columns:
                 validate_fieldspec(self.model, column)
+
+        if hasattr(self, 'paginate_by') or hasattr(self, 'columns'):
+            raise ValueError("The 'paginate_by' and 'columns' settings have been moved "
+                             "from the Bread class to the BrowseView class.")
+        if hasattr(self, 'filter'):
+            raise ValueError("The 'filter' setting has been renamed to 'filterset' and moved "
+                             "to the BrowseView.")
+        if hasattr(self, 'filterset'):
+            raise ValueError("The 'filterset' setting should be on the BrowseView, not "
+                             "the Bread view.")
 
     #####
     # B #
