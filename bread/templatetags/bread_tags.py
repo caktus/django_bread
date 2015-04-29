@@ -1,6 +1,11 @@
+import logging
+
 from django import template
 
+from bread.utils import get_model_field
 
+
+logger = logging.getLogger(__name__)
 register = template.Library()
 
 
@@ -12,16 +17,7 @@ def getter(value, arg):
     If the final result is a callable, it is called and its return
     value used.
     """
-    if '__' in arg:
-        # Get the value of the attribute name before the first '__', then
-        # recursively call `getter` to get the rest.
-        first_name, rest = arg.split('__', 1)
-        if not hasattr(value, first_name):
-            return 'No such field %r on %s' % (first_name, value)
-        first_obj = getattr(value, first_name)
-        result = getter(first_obj, rest)
-    else:
-        result = getattr(value, arg, 'No such field %r on %s' % (arg, value))
-    if callable(result):
-        result = result()
-    return result
+    try:
+        return get_model_field(value, arg)
+    except:
+        logger.exception("Something blew up: %s|getter:%s" % (value, arg))

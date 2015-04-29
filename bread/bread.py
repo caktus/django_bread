@@ -15,8 +15,11 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Model
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
+
+from .utils import validate_fieldspec
 
 
 """
@@ -41,7 +44,9 @@ def setting(name, default=None):
 class BreadViewMixin(object):
     """We mix this into all the views for some common features"""
     bread = None  # The Bread object using this view
-    filter = None
+
+    exclude = None
+    form_class = None
 
     # Make this view require the appropriate permission
     @property
@@ -99,9 +104,6 @@ class BreadViewMixin(object):
 
         return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
 
-    def get_paginate_by(self):
-        return self.bread.paginate_by
-
     def get_template_names(self):
         # Is there a template_name_pattern?
         if self.bread.template_name_pattern:
@@ -126,23 +128,10 @@ class BreadViewMixin(object):
         data = super(BreadViewMixin, self).get_context_data(**kwargs)
         # Include reference to the Bread object in template contexts
         data['bread'] = self.bread
-        data['columns'] = self.bread.columns
-        if data.get('is_paginated', False):
-            page = data['page_obj']
-            num_pages = data['paginator'].num_pages
-            if page.has_next():
-                if page.next_page_number() != num_pages:
-                    data['next_url'] = self._get_new_url(page=page.next_page_number())
-                data['last_url'] = self._get_new_url(page=num_pages)
-            if page.has_previous():
-                data['first_url'] = self._get_new_url(page=1)
-                if page.previous_page_number() != 1:
-                    data['previous_url'] = self._get_new_url(page=page.previous_page_number())
+        data['model_meta'] = self.model._meta
 
         # Template that the default bread templates should extend
         data['base_template'] = self.bread.base_template
-
-        data['filter'] = self.filter
 
         # Add 'may_<viewname>' to the context for each view, so the templates can
         # tell if the current user may use the named view.
@@ -159,13 +148,14 @@ class BreadViewMixin(object):
         return data
 
     def get_form(self, data=None, files=None, **kwargs):
-        if not self.form_class:
-            self.form_class = modelform_factory(
+        form_class = self.form_class or self.bread.form_class
+        if not form_class:
+            form_class = modelform_factory(
                 self.bread.model,
                 fields='__all__',
-                exclude=self.bread.exclude
+                exclude=self.exclude or self.bread.exclude
             )
-        return self.form_class(data=data, files=files, **kwargs)
+        return form_class(data=data, files=files, **kwargs)
 
     @property
     def success_url(self):
@@ -175,18 +165,43 @@ class BreadViewMixin(object):
 # The individual view classes we'll use and customize in the
 # omnibus class below:
 class BrowseView(BreadViewMixin, ListView):
+    # Configurable:
+    columns = []
+    filterset = None  # Class
+    paginate_by = None
     perm_name = 'browse'  # Not a default Django permission
     template_name_suffix = 'browse'
+
+    def __init__(self, *args, **kwargs):
+        super(BrowseView, self).__init__(*args, **kwargs)
+        # Internal use
+        self.filter = None
 
     def get_queryset(self):
         qset = super(BrowseView, self).get_queryset()
 
         # Now filter
-        if self.bread.filter:
-            self.filter = self.bread.filter(self.request.GET, queryset=qset)
+        if self.filterset is not None:
+            self.filter = self.filterset(self.request.GET, queryset=qset)
             qset = self.filter.qs
-
         return qset
+
+    def get_context_data(self, **kwargs):
+        data = super(BrowseView, self).get_context_data(**kwargs)
+        data['columns'] = self.columns
+        data['filter'] = self.filter
+        if data.get('is_paginated', False):
+            page = data['page_obj']
+            num_pages = data['paginator'].num_pages
+            if page.has_next():
+                if page.next_page_number() != num_pages:
+                    data['next_url'] = self._get_new_url(page=page.next_page_number())
+                data['last_url'] = self._get_new_url(page=num_pages)
+            if page.has_previous():
+                data['first_url'] = self._get_new_url(page=1)
+                if page.previous_page_number() != 1:
+                    data['previous_url'] = self._get_new_url(page=page.previous_page_number())
+        return data
 
 
 class ReadView(BreadViewMixin, DetailView):
@@ -244,9 +259,8 @@ class Bread(object):
 
     See `get_urls` for the resulting URL names and paths.
 
-    You could subclass Bread if you need to customize it a lot, but it
-    is intended that most customization can be done by passing parameters
-    to the constructor.
+    It is expected that you subclass `Bread` and customize it by at least
+    setting attributes on the subclass.
 
     Below, <name> refers to the lowercased model name, e.g. 'model'.
 
@@ -259,33 +273,6 @@ class Bread(object):
     * delete_<name>    (this is a default Django permission)
 
     Parameters:
-
-    model (required): The model class
-
-    plural_name (optional): Override just adding 's' to the lowercased name
-        of the model to form the plural
-
-    form_class (optional): override the custom form class we're using for this model
-
-    exclude (optional): list of names of fields not to include in the form
-
-    base_XXX_view_class (optional): override the base view classes
-
-    columns (optional): List of ('Title', 'attrname') pairs to customize the columns
-    in the browse view. 'attrname' may include '__' to drill down into fields,
-    e.g. 'user__name' to get the user's name, or 'type__get_number_display' to
-    call get_number_display() on the object from the type field.  (Assumes
-    the default template, obviously).
-
-    paginate_by (optional): Limit browsing to this many items per page, and add controls
-    to navigate among pages.
-
-    views (optional): Pass a string containing the first letters of the views to include.
-    Default is 'BREAD'.  Any omitted views will not have URLs defined and so will
-    not be accessible.
-
-    filter (optional): form class to use to control filtering. Must be a subclass
-    of django-filters' `django_filters.FilterSet` class.
 
     Assumes templates with the following names:
 
@@ -304,60 +291,44 @@ class Bread(object):
     `{view}` (`browse`, `read`, etc.).
 
     """
-    base_browse_view_class = BrowseView
-    base_read_view_class = ReadView
-    base_edit_view_class = EditView
-    base_add_view_class = AddView
-    base_delete_view_class = DeleteView
+    browse_view = BrowseView
+    read_view = ReadView
+    edit_view = EditView
+    add_view = AddView
+    delete_view = DeleteView
 
     exclude = []  # Names of fields not to show
-    columns = []
-    paginate_by = None
     views = "BREAD"
-    base_template = None
-    url_namespace = ''
+    base_template = setting('DEFAULT_BASE_TEMPLATE', 'base.html')
+    namespace = ''
+    template_name_pattern = setting('DEFAULT_TEMPLATE_NAME_PATTERN', None)
+    plural_name = None
+    form_class = None
 
-    def __init__(self,
-                 model,
-                 plural_name=None,
-                 form_class=None,
-                 exclude=None,
-                 base_browse_view_class=None,
-                 base_read_view_class=None,
-                 base_edit_view_class=None,
-                 base_add_view_class=None,
-                 base_delete_view_class=None,
-                 columns=None,
-                 paginate_by=None,
-                 views="BREAD",
-                 base_template=None,
-                 filter=None,
-                 template_name_pattern=None,
-                 url_namespace='',
-                 ):
-        if exclude is not None and form_class is not None:
-            raise ImproperlyConfigured(
-                "exclude and form_class are mutually exclusive - if you're overrding the form, "
-                "just specify the excluded fields there."
-            )
-        self.model = model
+    def __init__(self):
         self.name = self.model._meta.object_name.lower()
-        self.plural_name = plural_name or self.name + 's'
-        self.form_class = form_class
-        self.exclude = exclude or self.exclude
-        self.base_browse_view_class = base_browse_view_class or self.base_browse_view_class
-        self.base_read_view_class = base_read_view_class or self.base_read_view_class
-        self.base_edit_view_class = base_edit_view_class or self.base_edit_view_class
-        self.base_add_view_class = base_add_view_class or self.base_add_view_class
-        self.base_delete_view_class = base_delete_view_class or self.base_delete_view_class
-        self.columns = columns
-        self.paginate_by = paginate_by
-        self.views = views.upper()
-        self.base_template = base_template or setting('DEFAULT_BASE_TEMPLATE', 'base.html')
-        self.filter = filter
-        self.template_name_pattern = (template_name_pattern
-                                      or setting('DEFAULT_TEMPLATE_NAME_PATTERN', None))
-        self.url_namespace = url_namespace
+        self.views = self.views.upper()
+
+        if not self.plural_name:
+            self.plural_name = self.name + 's'
+
+        if not issubclass(self.model, Model):
+            raise TypeError("'model' argument for Bread must be a "
+                            "subclass of Model; it is %r" % self.model)
+
+        if self.browse_view.columns:
+            for title, column in self.browse_view.columns:
+                validate_fieldspec(self.model, column)
+
+        if hasattr(self, 'paginate_by') or hasattr(self, 'columns'):
+            raise ValueError("The 'paginate_by' and 'columns' settings have been moved "
+                             "from the Bread class to the BrowseView class.")
+        if hasattr(self, 'filter'):
+            raise ValueError("The 'filter' setting has been renamed to 'filterset' and moved "
+                             "to the BrowseView.")
+        if hasattr(self, 'filterset'):
+            raise ValueError("The 'filterset' setting should be on the BrowseView, not "
+                             "the Bread view.")
 
     #####
     # B #
@@ -369,7 +340,7 @@ class Bread(object):
     def get_browse_view(self):
         """Return a view method for browsing."""
 
-        return self.base_browse_view_class.as_view(
+        return self.browse_view.as_view(
             bread=self,
             model=self.model,
         )
@@ -381,7 +352,7 @@ class Bread(object):
         return self.get_url_name('read', include_namespace)
 
     def get_read_view(self):
-        return self.base_read_view_class.as_view(
+        return self.read_view.as_view(
             bread=self,
             model=self.model,
             form_class=self.form_class,
@@ -394,7 +365,7 @@ class Bread(object):
         return self.get_url_name('edit', include_namespace)
 
     def get_edit_view(self):
-        return self.base_edit_view_class.as_view(
+        return self.edit_view.as_view(
             bread=self,
             model=self.model,
             form_class=self.form_class,
@@ -407,7 +378,7 @@ class Bread(object):
         return self.get_url_name('add', include_namespace)
 
     def get_add_view(self):
-        return self.base_add_view_class.as_view(
+        return self.add_view.as_view(
             bread=self,
             model=self.model,
             form_class=self.form_class,
@@ -420,7 +391,7 @@ class Bread(object):
         return self.get_url_name('delete', include_namespace)
 
     def get_delete_view(self):
-        return self.base_delete_view_class.as_view(
+        return self.delete_view.as_view(
             bread=self,
             model=self.model,
         )
@@ -430,11 +401,11 @@ class Bread(object):
     ##########
     def get_url_name(self, view_name, include_namespace=True):
         if include_namespace:
-            url_namespace = self.url_namespace + ':' if self.url_namespace else ''
+            url_namespace = self.namespace + ':' if self.namespace else ''
         else:
             url_namespace = ''
         if view_name == 'browse':
-            return '%s%s_%ss' % (url_namespace, view_name, self.name)
+            return '%s%s_%s' % (url_namespace, view_name, self.plural_name)
         else:
             return '%s%s_%s' % (url_namespace, view_name, self.name)
 

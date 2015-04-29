@@ -14,9 +14,17 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
+class BreadTestModel2(models.Model):
+    text = models.CharField(max_length=20)
+
+    def get_text(self):
+        return self.text
+
+
 @python_2_unicode_compatible
 class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
+    other = models.ForeignKey(BreadTestModel2, blank=True, null=True)
 
     class Meta:
         ordering = ['name']
@@ -27,3 +35,14 @@ class BreadTestModel(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_name(self):
+        return self.name
+
+    def method1(self, arg):
+        # Method that has a required arg
+        pass
+
+    def method2(self, arg=None):
+        # method that has an optional arg
+        pass

@@ -77,8 +77,10 @@
 </table>
 <br/>
 
-{% if may_add %}
-  <a href="{% url bread.add_url_name %}">{% trans "Add" %}</a>
-{% elif debug %}
-  You do not have add permission.
+{% if not exclude_actions %}
+  {% if may_add %}
+    <a href="{% url bread.add_url_name %}">{% trans "Add" %}</a>
+  {% elif debug %}
+    You do not have add permission.
+  {% endif %}
 {% endif %}

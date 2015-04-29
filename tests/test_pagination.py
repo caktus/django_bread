@@ -2,20 +2,29 @@ try:
     from httplib import OK, METHOD_NOT_ALLOWED
 except ImportError:
     from http.client import OK, METHOD_NOT_ALLOWED
+
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from bread.bread import Bread
+
+from bread.bread import BrowseView
 from .base import BreadTestCase
 
 
+PAGE_SIZE = 5
+
+
 class BreadPaginationTest(BreadTestCase):
-    page_size = 5
+
+    class BrowseTestView(BrowseView):
+        paginate_by = PAGE_SIZE
+
+    extra_bread_attributes = {
+        'browse_view': BrowseTestView
+    }
 
     def setUp(self):
         super(BreadPaginationTest, self).setUp()
-        self.bread = Bread(model=self.model, base_template='bread/empty.html',
-                           paginate_by=self.page_size)
-        [self.model_factory() for __ in range(2 * self.page_size + 1)]
+        [self.model_factory() for __ in range(2 * PAGE_SIZE + 1)]
         self.set_urls(self.bread)
         self.give_permission('browse')
 
@@ -28,7 +37,7 @@ class BreadPaginationTest(BreadTestCase):
         rsp.render()
         context = rsp.context_data
         object_list = context['object_list']
-        self.assertEqual(self.page_size, len(object_list))
+        self.assertEqual(PAGE_SIZE, len(object_list))
         paginator = context['paginator']
         self.assertEqual(3, paginator.num_pages)
         # Should start with first item
@@ -44,12 +53,12 @@ class BreadPaginationTest(BreadTestCase):
         rsp.render()
         context = rsp.context_data
         object_list = context['object_list']
-        self.assertEqual(self.page_size, len(object_list))
+        self.assertEqual(PAGE_SIZE, len(object_list))
         paginator = context['paginator']
         self.assertEqual(3, paginator.num_pages)
         # Should start with item with index page_size
         ordered_items = self.model.objects.all()
-        self.assertEqual(object_list[0], ordered_items[self.page_size])
+        self.assertEqual(object_list[0], ordered_items[PAGE_SIZE])
 
     def test_get_page_past_the_end(self):
         url = reverse(self.bread.get_url_name('browse')) + "?page=99"
