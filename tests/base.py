@@ -3,7 +3,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, RequestFactory, override_settings
 
-from bread.bread import Bread
+from bread.bread import Bread, ReadView
 
 from .models import BreadTestModel
 from .factories import BreadTestModelFactory
@@ -17,6 +17,7 @@ urlpatterns = None
                           'DEFAULT_TEMPLATE_NAME_PATTERN': None})
 class BreadTestCase(TestCase):
     url_namespace = ''
+    extra_bread_attributes = {}
 
     def setUp(self):
         self.username = 'joe'
@@ -30,13 +31,23 @@ class BreadTestCase(TestCase):
         self.model_name = self.model._meta.model_name
         self.model_factory = BreadTestModelFactory
         self.request_factory = RequestFactory()
-        self.bread = Bread(model=self.model, base_template='bread/empty.html',
-                           url_namespace=self.url_namespace,
-                           columns=[
-                               ('Name', 'name'),
-                               ('Text', 'other__text'),
-                           ]
-                           )
+
+        class ReadClass(ReadView):
+            columns = [
+                ('Name', 'name'),
+                ('Text', 'other__text'),
+                ]
+
+        class BreadTestClass(Bread):
+            model = self.model
+            base_template = 'bread/empty.html'
+            namespace = self.url_namespace
+
+        for k, v in self.extra_bread_attributes.items():
+            setattr(BreadTestClass, k, v)
+
+        self.BreadTestClass = BreadTestClass
+        self.bread = BreadTestClass()
 
     def tearDown(self):
         global urlpatterns
