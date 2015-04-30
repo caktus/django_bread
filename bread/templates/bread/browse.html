@@ -1,7 +1,7 @@
 {% extends base_template %}
 {% load i18n %}
 
-{% block title %}{% blocktrans with names=model_meta.verbose_name_plural %}Browse {{ names }}{% endblocktrans %}{% endblock title %}
+{% block title %}{% blocktrans with names=verbose_name_plural %}Browse {{ names }}{% endblocktrans %}{% endblock title %}
 
 {% block content %}
 
