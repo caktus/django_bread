@@ -42,6 +42,7 @@ class BreadTestCase(TestCase):
             model = self.model
             base_template = 'bread/empty.html'
             namespace = self.url_namespace
+            plural_name = 'testmodels'
 
         for k, v in self.extra_bread_attributes.items():
             setattr(BreadTestClass, k, v)

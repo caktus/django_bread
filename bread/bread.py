@@ -409,11 +409,11 @@ class Bread(object):
         else:
             return '%s%s_%s' % (url_namespace, view_name, self.name)
 
-    def get_urls(self):
+    def get_urls(self, prefix=True):
         """
         Return urlpatterns to add for this model's BREAD interface.
 
-        These will be of the form:
+        By default, these will be of the form:
 
            Operation    Name                   URL
            ---------    --------------------   --------------------------
@@ -429,36 +429,42 @@ class Bread(object):
 
         If a restricted set of views is passed in the 'views' parameter, then
         only URLs for those views will be included.
+
+        If prefix is False, ``<plural_name>/`` will not be included on
+        the front of the URLs.
+
         """
+
+        prefix = '%s/' % self.plural_name if prefix else ''
 
         urlpatterns = []
         if 'B' in self.views:
             urlpatterns.append(
-                url(r'^%s/$' % self.plural_name,
+                url(r'^%s$' % prefix,
                     self.get_browse_view(),
                     name=self.browse_url_name(include_namespace=False)))
 
         if 'R' in self.views:
             urlpatterns.append(
-                url(r'^%s/(?P<pk>\d+)/$' % self.plural_name,
+                url(r'^%s(?P<pk>\d+)/$' % prefix,
                     self.get_read_view(),
                     name=self.read_url_name(include_namespace=False)))
 
         if 'E' in self.views:
             urlpatterns.append(
-                url(r'^%s/(?P<pk>\d+)/edit/$' % self.plural_name,
+                url(r'^%s(?P<pk>\d+)/edit/$' % prefix,
                     self.get_edit_view(),
                     name=self.edit_url_name(include_namespace=False)))
 
         if 'A' in self.views:
             urlpatterns.append(
-                url(r'^%s/add/$' % self.plural_name,
+                url(r'^%sadd/$' % prefix,
                     self.get_add_view(),
                     name=self.add_url_name(include_namespace=False)))
 
         if 'D' in self.views:
             urlpatterns.append(
-                url(r'^%s/(?P<pk>\d+)/delete/$' % self.plural_name,
+                url(r'^%s(?P<pk>\d+)/delete/$' % prefix,
                     self.get_delete_view(),
                     name=self.delete_url_name(include_namespace=False)))
         return urlpatterns
