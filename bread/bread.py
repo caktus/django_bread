@@ -128,7 +128,10 @@ class BreadViewMixin(object):
         data = super(BreadViewMixin, self).get_context_data(**kwargs)
         # Include reference to the Bread object in template contexts
         data['bread'] = self.bread
-        data['model_meta'] = self.model._meta
+
+        # Provide references to useful Model Meta attributes
+        data['verbose_name'] = self.model._meta.verbose_name
+        data['verbose_name_plural'] = self.model._meta.verbose_name_plural
 
         # Template that the default bread templates should extend
         data['base_template'] = self.bread.base_template
