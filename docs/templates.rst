@@ -66,9 +66,19 @@ There are 3 ways that you can customize this behavior even further:
    customization of your default template location, while still allowing you to override that
    site-wide default by using technique #1.
 
-3. Override ``get_template_names`` in a specific action View. This method should return a tuple of
-   strings representing template locations to search. This is the most specific customization, and
-   applies only to the Model/action view you override. Example:
+3. Set the ``template_name`` attribute in your View to the exact template that you want for that
+   view. Example:
+
+   .. code-block:: python
+
+      class MyBrowseView(BrowseView):
+          template_name = 'my/special-location.html'
+
+
+4. Override ``get_template_names`` in a specific action View. This method should return a tuple of
+   strings representing template locations to search. In most cases, using #3 is a simpler way to
+   achieve this. But if you have a situation where you need a list of templates to be searched then
+   here is an example on how to do that:
 
    .. code-block:: python
 
@@ -89,6 +99,6 @@ We mentioned above that each View is matched to a template with the same name (B
 '...browse.html'). This is true for everything except the AddView. Because add and edit templates
 are so similar, the AddView connects to the 'edit.html' template. There is no 'add.html' template.
 If you need your AddView to have its own template, there are 2 ways you can accomplish this. Either
-use method #3 above, or set ``template_name_suffix`` in your AddView class. It defaults to ``edit``,
-but if you change it to ``add`` then your AddView will be linked to a
+use methods #3 or #4 above, or set ``template_name_suffix`` in your AddView class. It defaults to
+``edit``, but if you change it to ``add`` then your AddView will be linked to a
 ``{app_label}/{model}add.html`` template instead.
