@@ -61,11 +61,10 @@ There are 3 ways that you can customize this behavior even further:
    the names ``app_label``, ``model``, or ``view``. An example of a valid pattern would be
    ``'{app_label}/special_{model}_{view}.html'``.
 
-2. Specify a Django setting ``BREAD['DEFAULT_TEMPLATE_NAME_PATTERN'] = 'blah'``. This will function
-   like #1 above, except for ALL bread objects on your site. You can still override this
-   customization with #1 for a specific bread object. Use this option to provide a site-wide
-   default. If, for some reason, you omit one of the action templates, then we'll fall back to the
-   Django Bread default.
+2. Create a subclass of Bread and set ``template_name_pattern`` in that subclass. Then, use that
+   subclass throughout your site instead of using Bread directly. This will achieve site-wide
+   customization of your default template location, while still allowing you to override that
+   site-wide default by using technique #1.
 
 3. Override ``get_template_names`` in a specific action View. This method should return a tuple of
    strings representing template locations to search. This is the most specific customization, and

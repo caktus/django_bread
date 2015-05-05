@@ -29,9 +29,6 @@ You can provide a Django setting named BREAD as a dictionary.
 Here are the settings, all currently optional:
 
 DEFAULT_BASE_TEMPLATE: Default value for Bread's base_template argument
-
-DEFAULT_TEMPLATE_NAME_PATTERN: Default value for Bread's
-template_name_pattern argument.
 """
 
 
@@ -306,7 +303,7 @@ class Bread(object):
     views = "BREAD"
     base_template = setting('DEFAULT_BASE_TEMPLATE', 'base.html')
     namespace = ''
-    template_name_pattern = setting('DEFAULT_TEMPLATE_NAME_PATTERN', None)
+    template_name_pattern = None
     plural_name = None
     form_class = None
 
