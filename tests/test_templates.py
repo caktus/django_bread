@@ -11,7 +11,7 @@ class BreadTemplateResolutionTest(BreadTestCase):
 
     def test_default_template_resolution(self):
         for bread_name in self.bread_names:
-            vanilla_template_name = '%s/%s%s.html' % (self.app_name, self.model_name, bread_name)
+            vanilla_template_name = '%s/%s_%s.html' % (self.app_name, self.model_name, bread_name)
             default_bread_template_name = 'bread/%s.html' % (bread_name, )
             expected_templates = [
                 vanilla_template_name,
@@ -26,7 +26,7 @@ class BreadTemplateResolutionTest(BreadTestCase):
         self.bread.template_name_pattern = 'mysite/bread/{view}.html'
 
         for bread_name in self.bread_names:
-            vanilla_template_name = '%s/%s%s.html' % (self.app_name, self.model_name, bread_name)
+            vanilla_template_name = '%s/%s_%s.html' % (self.app_name, self.model_name, bread_name)
             custom_template_name = 'mysite/bread/%s.html' % (bread_name, )
             default_bread_template_name = 'bread/%s.html' % (bread_name, )
             expected_templates = [

@@ -45,9 +45,9 @@ and then fall back to the templates provided by the Django Bread package.
 App-specific location
 ^^^^^^^^^^^^^^^^^^^^^
 
-The app-specific location is described by this pattern: ``{app_label}/{model}{view}.html``.
+The app-specific location is described by this pattern: ``{app_label}/{model}_{view}.html``.
 For example, if your app's name is MyApp and your model's name is MyModel, Django Bread will look
-for a browse template in ``myapp/mymodelbrowse.html``.
+for a browse template in ``myapp/mymodel_browse.html``.
 
 Customization
 ^^^^^^^^^^^^^
@@ -100,5 +100,5 @@ We mentioned above that each View is matched to a template with the same name (B
 are so similar, the AddView connects to the 'edit.html' template. There is no 'add.html' template.
 If you need your AddView to have its own template, there are 2 ways you can accomplish this. Either
 use methods #3 or #4 above, or set ``template_name_suffix`` in your AddView class. It defaults to
-``edit``, but if you change it to ``add`` then your AddView will be linked to a
-``{app_label}/{model}add.html`` template instead.
+``_edit``, but if you change it to ``_add`` then your AddView will be linked to a
+``{app_label}/{model}_add.html`` template instead.

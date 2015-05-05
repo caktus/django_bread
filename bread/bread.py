@@ -102,16 +102,23 @@ class BreadViewMixin(object):
         return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
-        # Return Django Vanilla templates (app-specific), then
-        #        Customized template via Bread object, then
-        #        Django Bread template
+        """Return Django Vanilla templates (app-specific), then
+                  Customized template via Bread object, then
+                  Django Bread template
+        """
         vanilla_templates = super(BreadViewMixin, self).get_template_names()
-        default_template = 'bread/%s.html' % self.template_name_suffix
+
+        # template_name_suffix may have a leading underscore (to make it work well with Django
+        # Vanilla Views). If it does, then we strip the underscore to get our 'view' name.
+        # e.g. template_name_suffix '_browse' -> view 'browse'
+        suffix = self.template_name_suffix
+        view = suffix[1:] if suffix.startswith('_') else suffix
+        default_template = 'bread/%s.html' % view
         if self.bread.template_name_pattern:
             custom_template = self.bread.template_name_pattern.format(
                 app_label=self.bread.model._meta.app_label,
                 model=self.bread.model._meta.object_name.lower(),
-                view=self.template_name_suffix
+                view=view
             )
             return vanilla_templates + [custom_template] + [default_template]
         return vanilla_templates + [default_template]
@@ -172,7 +179,7 @@ class BrowseView(BreadViewMixin, ListView):
     filterset = None  # Class
     paginate_by = None
     perm_name = 'browse'  # Not a default Django permission
-    template_name_suffix = 'browse'
+    template_name_suffix = '_browse'
 
     def __init__(self, *args, **kwargs):
         super(BrowseView, self).__init__(*args, **kwargs)
@@ -214,7 +221,7 @@ class ReadView(BreadViewMixin, DetailView):
     to make a custom template for this model.
     """
     perm_name = 'read'  # Not a default Django permission
-    template_name_suffix = 'read'
+    template_name_suffix = '_read'
 
     def get_context_data(self, **kwargs):
         data = super(ReadView, self).get_context_data(**kwargs)
@@ -224,7 +231,7 @@ class ReadView(BreadViewMixin, DetailView):
 
 class EditView(BreadViewMixin, UpdateView):
     perm_name = 'change'  # Default Django permission
-    template_name_suffix = 'edit'
+    template_name_suffix = '_edit'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -235,7 +242,7 @@ class EditView(BreadViewMixin, UpdateView):
 
 class AddView(BreadViewMixin, CreateView):
     perm_name = 'add'  # Default Django permission
-    template_name_suffix = 'edit'  # Yes 'edit' not 'add'
+    template_name_suffix = '_edit'  # Yes 'edit' not 'add'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -246,7 +253,7 @@ class AddView(BreadViewMixin, CreateView):
 
 class DeleteView(BreadViewMixin, DeleteView):
     perm_name = 'delete'  # Default Django permission
-    template_name_suffix = 'delete'
+    template_name_suffix = '_delete'
 
 
 class Bread(object):
