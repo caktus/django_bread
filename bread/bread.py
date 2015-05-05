@@ -103,18 +103,18 @@ class BreadViewMixin(object):
 
     def get_template_names(self):
         # Return Django Vanilla templates (app-specific), then
-        #        Customized templates (via Bread object or Django settings), then
-        #        Django Bread templates
+        #        Customized template via Bread object, then
+        #        Django Bread template
         vanilla_templates = super(BreadViewMixin, self).get_template_names()
-        default_templates = ['bread/%s.html' % self.template_name_suffix]
+        default_template = 'bread/%s.html' % self.template_name_suffix
         if self.bread.template_name_pattern:
-            custom_templates = [self.bread.template_name_pattern.format(
+            custom_template = self.bread.template_name_pattern.format(
                 app_label=self.bread.model._meta.app_label,
                 model=self.bread.model._meta.object_name.lower(),
                 view=self.template_name_suffix
-            )]
-            return (vanilla_templates + custom_templates + default_templates)
-        return (vanilla_templates + default_templates)
+            )
+            return vanilla_templates + [custom_template] + [default_template]
+        return vanilla_templates + [default_template]
 
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified

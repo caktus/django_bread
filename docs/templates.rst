@@ -8,8 +8,8 @@ This document describes how to use templates with Django Bread.
 Template Context
 ----------------
 
-In addition to what Django Vanilla Views provides, Django Bread provides the following to all of
-your templates::
+In addition to the context variables that Django Vanilla Views provides, Django Bread provides the
+following to all of your templates::
 
         Variable             Description
         --------             -----------
@@ -88,5 +88,7 @@ Caveat
 We mentioned above that each View is matched to a template with the same name (BrowseView ->
 '...browse.html'). This is true for everything except the AddView. Because add and edit templates
 are so similar, the AddView connects to the 'edit.html' template. There is no 'add.html' template.
-Of course, this can be customized as described above, if you need different templates for your
-AddView classes.
+If you need your AddView to have its own template, there are 2 ways you can accomplish this. Either
+use method #3 above, or set ``template_name_suffix`` in your AddView class. It defaults to ``edit``,
+but if you change it to ``add`` then your AddView will be linked to a
+``{app_label}/{model}add.html`` template instead.
