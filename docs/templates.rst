@@ -28,7 +28,7 @@ Override ``get_context_data`` to change the variables provided to your template:
 
    class MyBrowseView(BrowseView):
        def get_context_data(self, **kwargs):
-           data = super(BreadViewMixin, self).get_context_data(**kwargs)
+           data = super(BrowseView, self).get_context_data(**kwargs)
            data['my_special_var'] = 42
            return data
 
