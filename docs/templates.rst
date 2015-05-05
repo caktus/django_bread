@@ -45,7 +45,7 @@ and then fall back to the templates provided by the Django Bread package.
 App-specific location
 ^^^^^^^^^^^^^^^^^^^^^
 
-The app-specific location is described by this pattern: ``{app_name}/{model_name}{activity}.html``.
+The app-specific location is described by this pattern: ``{app_label}/{model}{view}.html``.
 For example, if your app's name is MyApp and your model's name is MyModel, Django Bread will look
 for a browse template in ``myapp/mymodelbrowse.html``.
 
