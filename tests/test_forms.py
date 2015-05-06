@@ -1,11 +1,9 @@
-try:
-    from httplib import FOUND, BAD_REQUEST, OK
-except ImportError:
-    from http.client import FOUND, BAD_REQUEST, OK
+from six.moves.http_client import FOUND, BAD_REQUEST, OK
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+
 from .models import BreadTestModel
 from .base import BreadTestCase
 

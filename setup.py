@@ -14,6 +14,7 @@ setup(
     install_requires=[
         'django-filter>=0.9.2,<1.0',
         'django-vanilla-views>=1.0.3,<2.0',
+        'six'
     ],
     long_description=open('README.rst').read(),
     classifiers=[

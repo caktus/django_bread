@@ -1,13 +1,12 @@
-try:
-    from httplib import FOUND
-except ImportError:
-    from http.client import FOUND
+from six.moves.http_client import FOUND
+
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.test import override_settings
+
 from .base import BreadTestCase
 
 
