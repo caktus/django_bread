@@ -59,6 +59,32 @@ def get_model_field(model_instance, spec):
     return value
 
 
+def get_verbose_name(an_object, field_name, title_cap=True):
+    """Given a model or model instance, return the verbose_name of the model's field.
+
+    If title_cap is True (the default), the verbose_name will be returned with the first letter
+    of each word capitalized which makes the verbose_name look nicer in labels.
+
+    If field_name doesn't refer to a model field, raises a FieldDoesNotExist error.
+    """
+    # get_field_by_name() can raise FieldDoesNotExist which I simply propogate up to the caller.
+    try:
+        field = an_object._meta.get_field_by_name(field_name)[0]
+    except TypeError:
+        # TypeError happens if the caller is very confused and passes an unhashable type such
+        # as {} or []. I convert that into a FieldDoesNotExist exception for simplicity.
+        raise FieldDoesNotExist("No field named {}".format(str(field_name)))
+
+    verbose_name = field.verbose_name
+
+    if title_cap:
+        # Title cap the label using this stackoverflow-approved technique:
+        # http://stackoverflow.com/questions/1549641/how-to-capitalize-the-first-letter-of-each-word-in-a-string-python
+        verbose_name = " ".join(word.capitalize() for word in verbose_name.split())
+
+    return verbose_name
+
+
 def has_required_args(func):
     """
     Return True if the function has any required arguments.
