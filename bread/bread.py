@@ -256,7 +256,7 @@ class LabelValueReadView(ReadView):
               (_('Answer'), 42),                    # Mode 5: '42'
               )
     """
-    template_name_suffix = 'label_value_read'
+    template_name_suffix = '_label_value_read'
     fields = []
 
     def get_context_data(self, **kwargs):
