@@ -1,11 +1,5 @@
-try:
-    # Python 2
-    from httplib import BAD_REQUEST
-    from urllib import urlencode
-except ImportError:
-    # Python 3
-    from http.client import BAD_REQUEST
-    from urllib.parse import urlencode
+from six.moves.http_client import BAD_REQUEST
+from six.moves.urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls import url
