@@ -1,3 +1,4 @@
+from six import string_types as six_string_types
 from six.moves.http_client import BAD_REQUEST
 from six.moves.urllib.parse import urlencode
 
@@ -267,7 +268,7 @@ class LabelValueReadView(ReadView):
         Implements the modes described in the class docstring. (q.v.)
         """
         value = ''
-        if isinstance(evaluator, basestring):
+        if isinstance(evaluator, six_string_types):
             if hasattr(self.object, evaluator):
                 # This is an instance attr or method
                 attr = getattr(self.object, evaluator)

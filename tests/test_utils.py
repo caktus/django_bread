@@ -1,8 +1,9 @@
 from django.core.exceptions import ValidationError
+from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase
 
-from bread.utils import get_model_field, validate_fieldspec, has_required_args
-from tests.models import BreadTestModel2, BreadTestModel
+from bread.utils import get_model_field, validate_fieldspec, has_required_args, get_verbose_name
+from tests.models import BreadTestModel2, BreadTestModel, BreadLabelValueTestModel
 
 
 class HasRequiredArgsTestCase(TestCase):
@@ -118,3 +119,30 @@ class ValidateFieldspecTestCase(TestCase):
     def test_no_such_attribute_on_other(self):
         with self.assertRaises(ValidationError):
             validate_fieldspec(BreadTestModel, 'other__petunias')
+
+
+class GetVerboseNameTest(TestCase):
+    """Exercise get_verbose_name()"""
+    def test_with_model(self):
+        """Ensure a model is accepted as a param"""
+        self.assertEqual(get_verbose_name(BreadLabelValueTestModel, 'banana'), "A Yellow Fruit")
+
+    def test_with_instance(self):
+        """Ensure a model instance is accepted as a param"""
+        self.assertEqual(get_verbose_name(BreadLabelValueTestModel(), 'banana'), "A Yellow Fruit")
+
+    def test_no_title_cap(self):
+        """Ensure title cap is optional"""
+        self.assertEqual(get_verbose_name(BreadLabelValueTestModel, 'banana', False),
+                         "a yellow fruit")
+
+    def test_field_with_no_explicit_verbose_name(self):
+        """Test behavior with a field to which we haven't given an explicit name"""
+        self.assertEqual(get_verbose_name(BreadLabelValueTestModel, 'id'), "Id")
+
+    def test_failure(self):
+        """Ensure FieldDoesNotExist is raised no matter what trash is passed as the field name"""
+        for field_name in ('kjasfhkjdh', u'sfasfda', None, 42, False, complex(42), lambda: None,
+                           ValueError(), {}, [], tuple()):
+            with self.assertRaises(FieldDoesNotExist):
+                get_verbose_name(BreadLabelValueTestModel, field_name)
