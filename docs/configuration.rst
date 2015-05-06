@@ -142,6 +142,37 @@ paginate_by
     Limit browsing to this many items per page, and add controls
     to navigate among pages.
 
+search_fields
+    If set, enables search. Value is a list or tuple like the
+    `same field <https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>`_
+    on the Django admin.
+
+    This also enables display of a search input box in the default browse
+    template.
+
+    If there's a GET query parameter named ``q``, then its value will be split into
+    words, and results will be limited to those that contain each of the words in
+    at least one of the specified fields, not case sensitive.
+
+    For example, if search_fields is set to ['first_name', 'last_name'] and a user
+    searches for john lennon, Django will do the equivalent of this SQL WHERE clause::
+
+        WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
+        AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
+
+    To customize the search behavior, you can override the ``get_search_results``
+    method on the browse view, which has the same signature and behavior as
+    the
+    `same method <https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.get_search_results>`_
+    in the admin.
+
+search_terms
+    If set, should be translated text listing the data fields that the search will
+    apply to. For example, if your ``search_fields`` are ``['name', 'phone', 'manager__name']``,
+    then you might set ``search_terms`` to ``_('name, phone number, or manager's name')``.
+    Then ``search_terms`` will be available in the browse template context to help
+    the user understand how their search will work.
+
 Read view configuration
 -----------------------
 

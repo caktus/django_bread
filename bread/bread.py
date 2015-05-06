@@ -1,15 +1,18 @@
+from functools import reduce
+from operator import or_
 from six.moves.http_client import BAD_REQUEST
 from six.moves.urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls import url
+from django.contrib.admin.utils import lookup_needs_distinct
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import Model
+from django.db.models import Model, Q
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -167,6 +170,8 @@ class BrowseView(BreadViewMixin, ListView):
     filterset = None  # Class
     paginate_by = None
     perm_name = 'browse'  # Not a default Django permission
+    search_fields = []
+    search_terms = None
     template_name_suffix = 'browse'
 
     def __init__(self, *args, **kwargs):
@@ -181,11 +186,26 @@ class BrowseView(BreadViewMixin, ListView):
         if self.filterset is not None:
             self.filter = self.filterset(self.request.GET, queryset=qset)
             qset = self.filter.qs
+
+        # Now search
+        q = self.request.GET.get('q', False)
+        if self.search_fields and q:
+            # print("Applying search. search_fields=%r, q=%r" % (self.search_fields, q))
+            qset, use_distinct = self.get_search_results(self.request, qset, q)
+            if use_distinct:
+                qset = qset.distinct()
+        # else:
+        #     print("Not applying search. search_fields=%r, q=%r" % (self.search_fields, q))
+
         return qset
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
         data['columns'] = self.columns
+        data['has_filter'] = bool(self.filter)
+        data['has_search'] = bool(self.search_fields)
+        if self.search_fields and self.search_terms:
+            data['search_terms'] = self.search_terms
         data['filter'] = self.filter
         if data.get('is_paginated', False):
             page = data['page_obj']
@@ -199,6 +219,41 @@ class BrowseView(BreadViewMixin, ListView):
                 if page.previous_page_number() != 1:
                     data['previous_url'] = self._get_new_url(page=page.previous_page_number())
         return data
+
+    # The following is copied from the Django admin and tweaked
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Returns a tuple containing a queryset to implement the search,
+        and a boolean indicating if the results may contain duplicates.
+        """
+        # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        use_distinct = False
+        search_fields = self.search_fields
+        if search_fields and search_term:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in search_fields]
+            for bit in search_term.split():
+                or_queries = [Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(or_, or_queries))
+            if not use_distinct:
+                opts = self.bread.model._meta
+                for search_spec in orm_lookups:
+                    if lookup_needs_distinct(opts, search_spec):
+                        use_distinct = True
+                        break
+
+        return queryset, use_distinct
 
 
 class ReadView(BreadViewMixin, DetailView):
