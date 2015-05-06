@@ -59,14 +59,11 @@ There are 3 ways that you can customize this behavior even further:
    ``template_name_pattern``, and then fall back to the Django Bread provided templates. The value
    supplied to ``template_name_pattern`` is a string that can take zero or more placeholders with
    the names ``app_label``, ``model``, or ``view``. An example of a valid pattern would be
-   ``'{app_label}/special_{model}_{view}.html'``.
+   ``'{app_label}/special_{model}_{view}.html'``. Note that you can use this technique to implement
+   site-wide customization by creating a subclass of Bread with ``template_name_pattern`` set, and
+   then use that subclass (or children of it) throughout your site.
 
-2. Create a subclass of Bread and set ``template_name_pattern`` in that subclass. Then, use that
-   subclass throughout your site instead of using Bread directly. This will achieve site-wide
-   customization of your default template location, while still allowing you to override that
-   site-wide default by using technique #1.
-
-3. Set the ``template_name`` attribute in your View to the exact template that you want for that
+2. Set the ``template_name`` attribute in your View to the exact template that you want for that
    view. Example:
 
    .. code-block:: python
@@ -75,7 +72,7 @@ There are 3 ways that you can customize this behavior even further:
           template_name = 'my/special-location.html'
 
 
-4. Override ``get_template_names`` in a specific action View. This method should return a tuple of
+3. Override ``get_template_names`` in a specific action View. This method should return a tuple of
    strings representing template locations to search. In most cases, using #3 is a simpler way to
    achieve this. But if you have a situation where you need a list of templates to be searched then
    here is an example on how to do that:

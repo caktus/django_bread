@@ -111,8 +111,7 @@ class BreadViewMixin(object):
         # template_name_suffix may have a leading underscore (to make it work well with Django
         # Vanilla Views). If it does, then we strip the underscore to get our 'view' name.
         # e.g. template_name_suffix '_browse' -> view 'browse'
-        suffix = self.template_name_suffix
-        view = suffix[1:] if suffix.startswith('_') else suffix
+        view = self.template_name_suffix.lstrip('_')
         default_template = 'bread/%s.html' % view
         if self.bread.template_name_pattern:
             custom_template = self.bread.template_name_pattern.format(
