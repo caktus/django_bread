@@ -1,11 +1,6 @@
-try:
-    # Python 2
-    from httplib import BAD_REQUEST
-    from urllib import urlencode
-except ImportError:
-    # Python 3
-    from http.client import BAD_REQUEST
-    from urllib.parse import urlencode
+from six import string_types as six_string_types
+from six.moves.http_client import BAD_REQUEST
+from six.moves.urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls import url
@@ -19,7 +14,7 @@ from django.db.models import Model
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from .utils import validate_fieldspec
+from .utils import validate_fieldspec, get_verbose_name
 
 
 """
@@ -226,6 +221,78 @@ class ReadView(BreadViewMixin, DetailView):
         data = super(ReadView, self).get_context_data(**kwargs)
         data['form'] = self.get_form(instance=self.object)
         return data
+
+
+class LabelValueReadView(ReadView):
+    """A alternative read view that displays data from (label, value) pairs rather than a form.
+
+    The (label, value) pairs are derived from a class attribute called fields. The tuples in
+    fields are manipulated according to the rules below before being passed as simple strings
+    to the template.
+
+    Unlike ReadView, you must subclass LabelValueReadView to make it useful. In most cases, your
+    subclass only needs to populate the fields attribute.
+
+    Specifically, fields should be an iterable of 2-tuples of (label, evaluator).
+
+    The label should be a string, or None. If it's None, the evaluator must be a Django model
+    field. The label is created from the field's verbose_name attribute.
+
+    The evaluator is evaluated in one of the following 5 modes, in this order --
+      1) a string that matches an attribute on self.object. Resolves to the value of the attribute.
+      2) a string that matches a method name on self.object. Resolves to the value of the method
+      call.
+      3) a string that's neither of the above. Resolves to itself.
+      4) a non-instance function that accepts the context data dict as a parameter. Resolves to the
+      value of the function. (Note that self.object is available to the called function via
+      context_data['object'].)
+      5) None of the above. Resolves to str(evaluator).
+
+    Some examples:
+    fields = ((None, 'id'),                         # Mode 1: self.object.id
+              (_('The length'), '__len__'),         # Mode 2: self.object.__len__()
+              (_('Foo'), 'bar'),                    # Mode 3: 'bar'
+              (_('Stuff'), 'frob_all_the_things'),  # Mode 4: frob_all_the_things(context_data)
+              (_('Answer'), 42),                    # Mode 5: '42'
+              )
+    """
+    template_name_suffix = 'label_value_read'
+    fields = []
+
+    def get_context_data(self, **kwargs):
+        context_data = super(LabelValueReadView, self).get_context_data(**kwargs)
+
+        context_data['read_fields'] = [self.get_field_label_value(label, value, context_data) for
+                                       label, value in self.fields]
+
+        return context_data
+
+    def get_field_label_value(self, label, evaluator, context_data):
+        """Given a 2-tuple from fields, return the corresponding (label, value) tuple.
+
+        Implements the modes described in the class docstring. (q.v.)
+        """
+        value = ''
+        if isinstance(evaluator, six_string_types):
+            if hasattr(self.object, evaluator):
+                # This is an instance attr or method
+                attr = getattr(self.object, evaluator)
+                # Modes #1 and #2.
+                value = attr() if callable(attr) else attr
+                if label is None:
+                    # evaluator refers to a model field (we hope).
+                    label = get_verbose_name(self.object, evaluator)
+            else:
+                # It's a simple string (Mode #3)
+                value = evaluator
+        else:
+            if callable(evaluator):
+                # This is a non-instance method (Mode #4)
+                value = evaluator(context_data)
+            else:
+                # Mode #5
+                value = str(evaluator)
+        return label, value
 
 
 class EditView(BreadViewMixin, UpdateView):

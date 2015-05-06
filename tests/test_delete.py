@@ -1,9 +1,8 @@
-try:
-    from httplib import FOUND, OK
-except ImportError:
-    from http.client import FOUND, OK
+from six.moves.http_client import FOUND, OK
+
 from django.core.urlresolvers import reverse
 from django.http import Http404
+
 from .base import BreadTestCase
 
 

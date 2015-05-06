@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<div id='fields'>
+  {% for label, value in read_fields %}
+    <div>
+      <label>{{ label }}</label>: <span class='value'>{{ value }}</span>
+    </div>
+  {% endfor %}
+</div>
+
+{% if not exclude_actions %}
+  {% if may_edit %}
+    <br/>
+    <a href="{% url bread.edit_url_name object.pk %}">{% trans "Edit" %}</a>
+  {% elif debug %}
+    <br/>
+    You do not have edit permission.
+  {% endif %}
+
+  <br/>
+  <a href="{% url bread.browse_url_name %}">{% trans "Back to list" %}</a>
+
+  {% if may_delete %}
+    <br/>
+    <a href="{% url bread.delete_url_name view.object.pk %}">{% trans "Delete" %}</a>
+  {% elif debug %}
+    <br/>
+    You do not have delete permission.
+  {% endif %}
+{% endif %}
