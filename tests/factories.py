@@ -1,7 +1,7 @@
 import factory
 import factory.fuzzy
 
-from .models import BreadTestModel, BreadTestModel2
+from .models import BreadTestModel, BreadTestModel2, BreadLabelValueTestModel
 
 
 class BreadTestModel2Factory(factory.DjangoModelFactory):
@@ -15,3 +15,9 @@ class BreadTestModelFactory(factory.DjangoModelFactory):
 
     name = factory.fuzzy.FuzzyText(length=10)
     other = factory.SubFactory(BreadTestModel2Factory)
+
+
+class BreadLabelValueTestModelFactory(factory.DjangoModelFactory):
+    FACTORY_FOR = BreadLabelValueTestModel
+
+    name = factory.fuzzy.FuzzyText(length=10)

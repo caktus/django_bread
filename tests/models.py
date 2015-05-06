@@ -1,17 +1,26 @@
 """
-We really need a model to test BREAD with, but Django's support for
+We really need models to test BREAD with, but Django's support for
 defining test-only models is (still) broken.  See
 https://code.djangoproject.com/ticket/7835 and scroll down to the
 end (it's been open over 6 years).
 
-So this model is here for the tests to use, but nothing else.
-If Django ever gets this sorted out, we can move this model
+So these models are here for the tests to use, but nothing else.
+If Django ever gets this sorted out, we can move these models
 to the tests, and maybe get fancier with different test models
 for different tests.
 """
 from __future__ import unicode_literals
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+
+
+class BreadLabelValueTestModel(models.Model):
+    """Model for testing LabelValueReadView, also for GetVerboseNameTest"""
+    name = models.CharField(max_length=10)
+    banana = models.IntegerField(verbose_name='a yellow fruit', default=0)
+
+    def name_reversed(self):
+        return self.name[::-1]
 
 
 class BreadTestModel2(models.Model):
