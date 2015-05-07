@@ -116,7 +116,7 @@ perm_name
 
 template_name_suffix
     The default string that the template this view uses will end with.
-    Defaults are 'browse', 'read', 'edit', 'edit' (not 'add'), and 'delete'.
+    Defaults are '_browse', '_read', '_edit', '_edit' (not '_add'), and '_delete'.
     See also :ref:`templates`.
 
 
@@ -189,6 +189,23 @@ exclude
 form_class
     specify a custom form class to use for this model in this view
 
+Alternate read view configuration
+---------------------------------
+
+The default read view uses a form to describe which fields to display. If
+you would rather have more flexibilty, subclass `bread.LabelValueReadView`
+and set these parameters.
+
+LabelValueReadView is a subclass of ReadView.
+
+fields
+    A list of 2-tuples of (label, evaluator) where the evaluator is reference
+    to an object attribute, an object method, a function, or one of a few other
+    options. In addition, the label can be automatically generated for you in
+    some cases.
+
+    See the class docstring for full details.
+
 Edit view configuration
 -----------------------
 
@@ -221,4 +238,3 @@ exclude
 
 form_class
     specify a custom form class to use for this model in this view
-

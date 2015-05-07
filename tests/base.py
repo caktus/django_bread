@@ -13,8 +13,7 @@ urlpatterns = None
 
 
 @override_settings(ROOT_URLCONF='tests.base',
-                   BREAD={'DEFAULT_BASE_TEMPLATE': 'bread/empty.html',
-                          'DEFAULT_TEMPLATE_NAME_PATTERN': None})
+                   BREAD={'DEFAULT_BASE_TEMPLATE': 'bread/empty.html', })
 class BreadTestCase(TestCase):
     url_namespace = ''
     extra_bread_attributes = {}
