@@ -1,9 +1,4 @@
-try:
-    # Python 2
-    from httplib import OK
-except ImportError:
-    # Python 3
-    from http.client import OK
+from six.moves.http_client import OK
 
 from tests.base import BreadTestCase
 from tests.factories import BreadTestModelFactory
@@ -58,6 +53,11 @@ class BreadSearchTestCase(BreadTestCase):
         objs = self.get_search_results(q='Joe')
         obj_ids = [obj.id for obj in objs]
         self.assertEqual([self.joe.id], obj_ids)
+
+    def test_simple_search_any_field(self):
+        # All records that match any field are returned
+        objs = self.get_search_results(q='i')
+        self.assertEqual(2, len(objs))
 
     def test_simple_search_indirect_field(self):
         objs = self.get_search_results(q='Smith')

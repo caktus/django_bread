@@ -13,7 +13,7 @@
    <form method="GET">
      {% if has_search %}
        <div class="control-group">
-         <p>{% blocktrans with names=view.bread.verbose_name_plural %}Search {{ names }}{% endblocktrans %}</p>
+         <p>{% blocktrans with names=verbose_name_plural %}Search {{ names }}{% endblocktrans %}</p>
          <p>
          <input name="q" type="search">
          {% blocktrans %}Searches in these fields: {{ search_terms }} {% endblocktrans %}

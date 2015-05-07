@@ -191,12 +191,9 @@ class BrowseView(BreadViewMixin, ListView):
         # Now search
         q = self.request.GET.get('q', False)
         if self.search_fields and q:
-            # print("Applying search. search_fields=%r, q=%r" % (self.search_fields, q))
             qset, use_distinct = self.get_search_results(self.request, qset, q)
             if use_distinct:
                 qset = qset.distinct()
-        # else:
-        #     print("Not applying search. search_fields=%r, q=%r" % (self.search_fields, q))
 
         return qset
 
