@@ -3,6 +3,13 @@
 Change Log
 ==========
 
+0.1.4 - May 7, 2015
+-------------------
+
+* Add search
+* Add doc for LabelValueReadView
+* More flexible template resolution
+
 0.1.3 - May 6, 2015
 -------------------
 
