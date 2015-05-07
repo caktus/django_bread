@@ -1,16 +1,19 @@
+from functools import reduce
+from operator import or_
 from six import string_types as six_string_types
 from six.moves.http_client import BAD_REQUEST
 from six.moves.urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls import url
+from django.contrib.admin.utils import lookup_needs_distinct
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import Model
+from django.db.models import Model, Q
 from django.forms.models import modelform_factory
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
@@ -24,9 +27,6 @@ You can provide a Django setting named BREAD as a dictionary.
 Here are the settings, all currently optional:
 
 DEFAULT_BASE_TEMPLATE: Default value for Bread's base_template argument
-
-DEFAULT_TEMPLATE_NAME_PATTERN: Default value for Bread's
-template_name_pattern argument.
 """
 
 
@@ -100,17 +100,25 @@ class BreadViewMixin(object):
         return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
-        # Is there a template_name_pattern?
+        """Return Django Vanilla templates (app-specific), then
+                  Customized template via Bread object, then
+                  Django Bread template
+        """
+        vanilla_templates = super(BreadViewMixin, self).get_template_names()
+
+        # template_name_suffix may have a leading underscore (to make it work well with Django
+        # Vanilla Views). If it does, then we strip the underscore to get our 'view' name.
+        # e.g. template_name_suffix '_browse' -> view 'browse'
+        view = self.template_name_suffix.lstrip('_')
+        default_template = 'bread/%s.html' % view
         if self.bread.template_name_pattern:
-            return [self.bread.template_name_pattern.format(
+            custom_template = self.bread.template_name_pattern.format(
                 app_label=self.bread.model._meta.app_label,
                 model=self.bread.model._meta.object_name.lower(),
-                view=self.template_name_suffix
-            )]
-        # First try the default names for Django Vanilla views, then
-        # add on 'bread/<viewname>.html' as a final possibility.
-        return (super(BreadViewMixin, self).get_template_names()
-                + ['bread/%s.html' % self.template_name_suffix])
+                view=view
+            )
+            return vanilla_templates + [custom_template] + [default_template]
+        return vanilla_templates + [default_template]
 
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified
@@ -168,7 +176,9 @@ class BrowseView(BreadViewMixin, ListView):
     filterset = None  # Class
     paginate_by = None
     perm_name = 'browse'  # Not a default Django permission
-    template_name_suffix = 'browse'
+    search_fields = []
+    search_terms = None
+    template_name_suffix = '_browse'
 
     def __init__(self, *args, **kwargs):
         super(BrowseView, self).__init__(*args, **kwargs)
@@ -182,11 +192,23 @@ class BrowseView(BreadViewMixin, ListView):
         if self.filterset is not None:
             self.filter = self.filterset(self.request.GET, queryset=qset)
             qset = self.filter.qs
+
+        # Now search
+        q = self.request.GET.get('q', False)
+        if self.search_fields and q:
+            qset, use_distinct = self.get_search_results(self.request, qset, q)
+            if use_distinct:
+                qset = qset.distinct()
+
         return qset
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
         data['columns'] = self.columns
+        data['has_filter'] = bool(self.filter)
+        data['has_search'] = bool(self.search_fields)
+        if self.search_fields and self.search_terms:
+            data['search_terms'] = self.search_terms
         data['filter'] = self.filter
         if data.get('is_paginated', False):
             page = data['page_obj']
@@ -201,6 +223,41 @@ class BrowseView(BreadViewMixin, ListView):
                     data['previous_url'] = self._get_new_url(page=page.previous_page_number())
         return data
 
+    # The following is copied from the Django admin and tweaked
+    def get_search_results(self, request, queryset, search_term):
+        """
+        Returns a tuple containing a queryset to implement the search,
+        and a boolean indicating if the results may contain duplicates.
+        """
+        # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+        use_distinct = False
+        search_fields = self.search_fields
+        if search_fields and search_term:
+            orm_lookups = [construct_search(str(search_field))
+                           for search_field in search_fields]
+            for bit in search_term.split():
+                or_queries = [Q(**{orm_lookup: bit})
+                              for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(or_, or_queries))
+            if not use_distinct:
+                opts = self.bread.model._meta
+                for search_spec in orm_lookups:
+                    if lookup_needs_distinct(opts, search_spec):
+                        use_distinct = True
+                        break
+
+        return queryset, use_distinct
+
 
 class ReadView(BreadViewMixin, DetailView):
     """
@@ -210,7 +267,7 @@ class ReadView(BreadViewMixin, DetailView):
     to make a custom template for this model.
     """
     perm_name = 'read'  # Not a default Django permission
-    template_name_suffix = 'read'
+    template_name_suffix = '_read'
 
     def get_context_data(self, **kwargs):
         data = super(ReadView, self).get_context_data(**kwargs)
@@ -251,7 +308,7 @@ class LabelValueReadView(ReadView):
               (_('Answer'), 42),                    # Mode 5: '42'
               )
     """
-    template_name_suffix = 'label_value_read'
+    template_name_suffix = '_label_value_read'
     fields = []
 
     def get_context_data(self, **kwargs):
@@ -292,7 +349,7 @@ class LabelValueReadView(ReadView):
 
 class EditView(BreadViewMixin, UpdateView):
     perm_name = 'change'  # Default Django permission
-    template_name_suffix = 'edit'
+    template_name_suffix = '_edit'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -303,7 +360,7 @@ class EditView(BreadViewMixin, UpdateView):
 
 class AddView(BreadViewMixin, CreateView):
     perm_name = 'add'  # Default Django permission
-    template_name_suffix = 'edit'  # Yes 'edit' not 'add'
+    template_name_suffix = '_edit'  # Yes 'edit' not 'add'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -314,7 +371,7 @@ class AddView(BreadViewMixin, CreateView):
 
 class DeleteView(BreadViewMixin, DeleteView):
     perm_name = 'delete'  # Default Django permission
-    template_name_suffix = 'delete'
+    template_name_suffix = '_delete'
 
 
 class Bread(object):
@@ -346,11 +403,11 @@ class Bread(object):
 
     Assumes templates with the following names:
 
-        Browse - <app>/<name>_browse.html
-        Read   - <app>/<name>_read.html
-        Edit   - <app>/<name>_edit.html
-        Add    - <app>/<name>_add.html
-        Delete - <app>/<name>_confirm_delete.html
+        Browse - <app>/<name>browse.html
+        Read   - <app>/<name>read.html
+        Edit   - <app>/<name>edit.html
+        Add    - <app>/<name>add.html
+        Delete - <app>/<name>delete.html
 
     but defaults to bread/<activity>.html if those aren't found.  The bread/<activity>.html
     templates are very generic, but you can pass 'base_template' as the name of a template
@@ -371,7 +428,7 @@ class Bread(object):
     views = "BREAD"
     base_template = setting('DEFAULT_BASE_TEMPLATE', 'base.html')
     namespace = ''
-    template_name_pattern = setting('DEFAULT_TEMPLATE_NAME_PATTERN', None)
+    template_name_pattern = None
     plural_name = None
     form_class = None
 

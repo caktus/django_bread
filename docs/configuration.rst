@@ -116,7 +116,7 @@ perm_name
 
 template_name_suffix
     The default string that the template this view uses will end with.
-    Defaults are 'browse', 'read', 'edit', 'edit' (not 'add'), and 'delete'.
+    Defaults are '_browse', '_read', '_edit', '_edit' (not '_add'), and '_delete'.
     See also :ref:`templates`.
 
 
@@ -142,6 +142,37 @@ paginate_by
     Limit browsing to this many items per page, and add controls
     to navigate among pages.
 
+search_fields
+    If set, enables search. Value is a list or tuple like the
+    `same field <https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.search_fields>`_
+    on the Django admin.
+
+    This also enables display of a search input box in the default browse
+    template.
+
+    If there's a GET query parameter named ``q``, then its value will be split into
+    words, and results will be limited to those that contain each of the words in
+    at least one of the specified fields, not case sensitive.
+
+    For example, if search_fields is set to ['first_name', 'last_name'] and a user
+    searches for john lennon, Django will do the equivalent of this SQL WHERE clause::
+
+        WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
+        AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
+
+    To customize the search behavior, you can override the ``get_search_results``
+    method on the browse view, which has the same signature and behavior as
+    the
+    `same method <https://docs.djangoproject.com/en/dev/ref/contrib/admin/#django.contrib.admin.ModelAdmin.get_search_results>`_
+    in the admin.
+
+search_terms
+    If set, should be translated text listing the data fields that the search will
+    apply to. For example, if your ``search_fields`` are ``['name', 'phone', 'manager__name']``,
+    then you might set ``search_terms`` to ``_('name, phone number, or manager's name')``.
+    Then ``search_terms`` will be available in the browse template context to help
+    the user understand how their search will work.
+
 Read view configuration
 -----------------------
 
@@ -157,6 +188,23 @@ exclude
 
 form_class
     specify a custom form class to use for this model in this view
+
+Alternate read view configuration
+---------------------------------
+
+The default read view uses a form to describe which fields to display. If
+you would rather have more flexibilty, subclass `bread.LabelValueReadView`
+and set these parameters.
+
+LabelValueReadView is a subclass of ReadView.
+
+fields
+    A list of 2-tuples of (label, evaluator) where the evaluator is reference
+    to an object attribute, an object method, a function, or one of a few other
+    options. In addition, the label can be automatically generated for you in
+    some cases.
+
+    See the class docstring for full details.
 
 Edit view configuration
 -----------------------
@@ -190,4 +238,3 @@ exclude
 
 form_class
     specify a custom form class to use for this model in this view
-
