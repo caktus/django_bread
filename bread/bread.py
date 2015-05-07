@@ -24,9 +24,6 @@ You can provide a Django setting named BREAD as a dictionary.
 Here are the settings, all currently optional:
 
 DEFAULT_BASE_TEMPLATE: Default value for Bread's base_template argument
-
-DEFAULT_TEMPLATE_NAME_PATTERN: Default value for Bread's
-template_name_pattern argument.
 """
 
 
@@ -100,17 +97,25 @@ class BreadViewMixin(object):
         return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
-        # Is there a template_name_pattern?
+        """Return Django Vanilla templates (app-specific), then
+                  Customized template via Bread object, then
+                  Django Bread template
+        """
+        vanilla_templates = super(BreadViewMixin, self).get_template_names()
+
+        # template_name_suffix may have a leading underscore (to make it work well with Django
+        # Vanilla Views). If it does, then we strip the underscore to get our 'view' name.
+        # e.g. template_name_suffix '_browse' -> view 'browse'
+        view = self.template_name_suffix.lstrip('_')
+        default_template = 'bread/%s.html' % view
         if self.bread.template_name_pattern:
-            return [self.bread.template_name_pattern.format(
+            custom_template = self.bread.template_name_pattern.format(
                 app_label=self.bread.model._meta.app_label,
                 model=self.bread.model._meta.object_name.lower(),
-                view=self.template_name_suffix
-            )]
-        # First try the default names for Django Vanilla views, then
-        # add on 'bread/<viewname>.html' as a final possibility.
-        return (super(BreadViewMixin, self).get_template_names()
-                + ['bread/%s.html' % self.template_name_suffix])
+                view=view
+            )
+            return vanilla_templates + [custom_template] + [default_template]
+        return vanilla_templates + [default_template]
 
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified
@@ -168,7 +173,7 @@ class BrowseView(BreadViewMixin, ListView):
     filterset = None  # Class
     paginate_by = None
     perm_name = 'browse'  # Not a default Django permission
-    template_name_suffix = 'browse'
+    template_name_suffix = '_browse'
 
     def __init__(self, *args, **kwargs):
         super(BrowseView, self).__init__(*args, **kwargs)
@@ -210,7 +215,7 @@ class ReadView(BreadViewMixin, DetailView):
     to make a custom template for this model.
     """
     perm_name = 'read'  # Not a default Django permission
-    template_name_suffix = 'read'
+    template_name_suffix = '_read'
 
     def get_context_data(self, **kwargs):
         data = super(ReadView, self).get_context_data(**kwargs)
@@ -251,7 +256,7 @@ class LabelValueReadView(ReadView):
               (_('Answer'), 42),                    # Mode 5: '42'
               )
     """
-    template_name_suffix = 'label_value_read'
+    template_name_suffix = '_label_value_read'
     fields = []
 
     def get_context_data(self, **kwargs):
@@ -292,7 +297,7 @@ class LabelValueReadView(ReadView):
 
 class EditView(BreadViewMixin, UpdateView):
     perm_name = 'change'  # Default Django permission
-    template_name_suffix = 'edit'
+    template_name_suffix = '_edit'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -303,7 +308,7 @@ class EditView(BreadViewMixin, UpdateView):
 
 class AddView(BreadViewMixin, CreateView):
     perm_name = 'add'  # Default Django permission
-    template_name_suffix = 'edit'  # Yes 'edit' not 'add'
+    template_name_suffix = '_edit'  # Yes 'edit' not 'add'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -314,7 +319,7 @@ class AddView(BreadViewMixin, CreateView):
 
 class DeleteView(BreadViewMixin, DeleteView):
     perm_name = 'delete'  # Default Django permission
-    template_name_suffix = 'delete'
+    template_name_suffix = '_delete'
 
 
 class Bread(object):
@@ -346,11 +351,11 @@ class Bread(object):
 
     Assumes templates with the following names:
 
-        Browse - <app>/<name>_browse.html
-        Read   - <app>/<name>_read.html
-        Edit   - <app>/<name>_edit.html
-        Add    - <app>/<name>_add.html
-        Delete - <app>/<name>_confirm_delete.html
+        Browse - <app>/<name>browse.html
+        Read   - <app>/<name>read.html
+        Edit   - <app>/<name>edit.html
+        Add    - <app>/<name>add.html
+        Delete - <app>/<name>delete.html
 
     but defaults to bread/<activity>.html if those aren't found.  The bread/<activity>.html
     templates are very generic, but you can pass 'base_template' as the name of a template
@@ -371,7 +376,7 @@ class Bread(object):
     views = "BREAD"
     base_template = setting('DEFAULT_BASE_TEMPLATE', 'base.html')
     namespace = ''
-    template_name_pattern = setting('DEFAULT_TEMPLATE_NAME_PATTERN', None)
+    template_name_pattern = None
     plural_name = None
     form_class = None
 

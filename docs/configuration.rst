@@ -116,7 +116,7 @@ perm_name
 
 template_name_suffix
     The default string that the template this view uses will end with.
-    Defaults are 'browse', 'read', 'edit', 'edit' (not 'add'), and 'delete'.
+    Defaults are '_browse', '_read', '_edit', '_edit' (not '_add'), and '_delete'.
     See also :ref:`templates`.
 
 
@@ -207,4 +207,3 @@ exclude
 
 form_class
     specify a custom form class to use for this model in this view
-
