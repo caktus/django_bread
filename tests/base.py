@@ -3,7 +3,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, RequestFactory, override_settings
 
-from bread.bread import Bread, ReadView
+from bread.bread import Bread, ReadView, BrowseView
 
 from .models import BreadTestModel
 from .factories import BreadTestModelFactory
@@ -37,9 +37,16 @@ class BreadTestCase(TestCase):
                 ('Text', 'other__text'),
                 ]
 
+        class BrowseClass(BrowseView):
+            columns = [
+                ('Name', 'name'),
+                ('Text', 'other__text')
+            ]
+
         class BreadTestClass(Bread):
             model = self.model
             base_template = 'bread/empty.html'
+            browse_view = BrowseClass
             namespace = self.url_namespace
             plural_name = 'testmodels'
 

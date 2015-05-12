@@ -1,3 +1,4 @@
 include *.txt
 recursive-include docs *.txt *.rst
+recursive-include bread/static *
 recursive-include bread/templates *

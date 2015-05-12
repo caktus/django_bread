@@ -45,15 +45,21 @@
          {% endfor %}
       {% endif %}
 
+     {% if o != "" %}<input type="hidden" name="o" value="{{ o }}">{% endif %}
+
      <input type="submit" value="{% trans 'Search' %}">
    </form>
  {% endif %}
 
 <table border="1">
   {% if columns %}
+    <script>
+      var o_field = "{{o}}",
+          valid_sorting_columns = JSON.parse("{{ valid_sorting_columns_json }}");
+    </script>
     <tr>
       {% for label, field_name in columns %}
-        <th>{{ label }}</th>
+        <th class="col_header">{{ label }}</th>
       {% endfor %}
     </tr>
   {% endif %}

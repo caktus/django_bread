@@ -1,4 +1,5 @@
 from functools import reduce
+import json
 from operator import or_
 from six import string_types as six_string_types
 from six.moves.http_client import BAD_REQUEST
@@ -11,13 +12,20 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied, FieldError
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Model, Q
+from django.db.models.sql import EmptyResultSet
 from django.forms.models import modelform_factory
+from django.http.response import HttpResponseBadRequest
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from .utils import validate_fieldspec, get_verbose_name
+
+
+class Http400(Exception):
+    def __init__(self, msg):
+        self.msg = msg
 
 
 """
@@ -97,7 +105,10 @@ class BreadViewMixin(object):
         if not has_permission:  # If the user lacks the permission
             raise PermissionDenied  # return a forbidden response.
 
-        return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
+        try:
+            return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
+        except Http400 as e:
+            return HttpResponseBadRequest(content=e.msg.encode('utf-8'))
 
     def get_template_names(self):
         """Return Django Vanilla templates (app-specific), then
@@ -180,31 +191,99 @@ class BrowseView(BreadViewMixin, ListView):
     search_terms = None
     template_name_suffix = '_browse'
 
+    _valid_sorting_columns = []  # indices of columns that are valid in ordering parms
+
     def __init__(self, *args, **kwargs):
         super(BrowseView, self).__init__(*args, **kwargs)
         # Internal use
         self.filter = None
 
+        # See which columns we can sort on
+        self._valid_sorting_columns = []
+        for i in range(len(self.columns)):
+            fieldspec = self.get_sort_field_name_for_column(i)
+            queryset = self.model.objects.order_by(fieldspec)
+            try:
+                # Force Django to build the query so it will validate the order_by args
+                str(queryset.query)
+            except FieldError:
+                pass
+            else:
+                self._valid_sorting_columns.append(i)
+
+    def get_sort_field_name_for_column(self, column_number):
+        """
+        Returns the name to use in an `order_by` call on a queryset
+        to sort by the 'column_number'-th column.
+        """
+        column = self.columns[column_number]
+        sortspec = column[-1]
+        return sortspec() if callable(sortspec) else sortspec
+
     def get_queryset(self):
         qset = super(BrowseView, self).get_queryset()
 
-        # Now filter
-        if self.filterset is not None:
-            self.filter = self.filterset(self.request.GET, queryset=qset)
-            qset = self.filter.qs
+        # Make a copy of the query parms. We need to remove the
+        # sorting and search parms from this as we process them,
+        # so the filter won't try to use them. That also means we
+        # need to do the filtering last.
+        query_parms = self.request.GET.copy()
 
         # Now search
-        q = self.request.GET.get('q', False)
+        # QueryDict.pop() always returns a list
+        q = query_parms.pop('q', [False])[0]
         if self.search_fields and q:
             qset, use_distinct = self.get_search_results(self.request, qset, q)
             if use_distinct:
                 qset = qset.distinct()
 
+        # Sort?
+        o = query_parms.pop('o', [False])[0]
+        if o:
+            order_by = []
+            for o_field in o.split(','):
+                prefix = ''
+                if o_field.startswith('-'):
+                    prefix = '-'
+                    o_field = o_field[1:]
+                try:
+                    column_number = int(o_field)
+                except ValueError:
+                    raise Http400("%s is not a valid integer in sorting param o=%r" %
+                                  (o_field, o))
+                if column_number not in self._valid_sorting_columns:
+                    raise Http400(
+                        "%d is not a valid column number to sort on. "
+                        "The valid column numbers are %r"
+                        % (column_number, self._valid_sorting_columns))
+                order_by.append('%s%s' %
+                                (prefix, self.get_sort_field_name_for_column(column_number)))
+            qset = qset.order_by(*order_by)
+            # Validate those parms
+            try:
+                str(qset.query)  # unused, just evaluate it to make it compile the query
+            except FieldError as e:
+                raise Http400(
+                    "There is an invalid column for sorting in the ordering parameter: %s" % str(e)
+                )
+            except EmptyResultSet:
+                # It can throw this but we don't care
+                pass
+
+        # Now filter
+        if self.filterset is not None:
+            self.filter = self.filterset(query_parms, queryset=qset)
+            qset = self.filter.qs
+
         return qset
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
+        o = self.request.GET.get('o', False)
+        if o:
+            data['o'] = o
         data['columns'] = self.columns
+        data['valid_sorting_columns_json'] = json.dumps(self._valid_sorting_columns)
         data['has_filter'] = bool(self.filter)
         data['has_search'] = bool(self.search_fields)
         if self.search_fields and self.search_terms:
@@ -444,7 +523,8 @@ class Bread(object):
                             "subclass of Model; it is %r" % self.model)
 
         if self.browse_view.columns:
-            for title, column in self.browse_view.columns:
+            for colspec in self.browse_view.columns:
+                column = colspec[1]
                 validate_fieldspec(self.model, column)
 
         if hasattr(self, 'paginate_by') or hasattr(self, 'columns'):
