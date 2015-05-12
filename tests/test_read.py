@@ -103,9 +103,9 @@ class BreadLabelValueReadTest(BreadTestCase):
         for expected in (
             "<label>Id</label>: <span class='value'>{}</span>".format(item.id),
             "<label>A Yellow Fruit</label>: <span class='value'>0</span>",
-            "<label>eman</label>: <span class='value'>edcba</span>",
+            "<label>Eman</label>: <span class='value'>edcba</span>",
             "<label>Foo</label>: <span class='value'>bar</span>",
-            "<label>context first key</label>: <span class='value'>{}</span>".format(key),
+            "<label>Context first key</label>: <span class='value'>{}</span>".format(key),
             "<label>Answer</label>: <span class='value'>42</span>",
                 ):
             self.assertContains(rsp, expected)

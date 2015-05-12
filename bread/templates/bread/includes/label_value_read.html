@@ -3,7 +3,7 @@
 <div id='fields'>
   {% for label, value in read_fields %}
     <div>
-      <label>{{ label }}</label>: <span class='value'>{{ value }}</span>
+      <label>{{ label|capfirst }}</label>: <span class='value'>{{ value }}</span>
     </div>
   {% endfor %}
 </div>
