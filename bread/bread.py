@@ -204,6 +204,9 @@ class BrowseView(BreadViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
+        q = self.request.GET.get('q', False)
+        if q:
+            data['q'] = q
         data['columns'] = self.columns
         data['has_filter'] = bool(self.filter)
         data['has_search'] = bool(self.search_fields)
