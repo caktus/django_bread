@@ -15,7 +15,7 @@
        <div class="control-group">
          <p>{% blocktrans with names=verbose_name_plural %}Search {{ names }}{% endblocktrans %}</p>
          <p>
-         <input name="q" type="search">
+         <input name="q" type="search" value="{{ q }}">
          {% blocktrans %}Searches in these fields: {{ search_terms }} {% endblocktrans %}
          </p>
        </div>

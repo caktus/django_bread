@@ -49,7 +49,11 @@ def get_model_field(model_instance, spec):
         raise ValueError("%r should be an instance of a model but it is a %s"
                          % (model_instance, type(model_instance)))
 
-    name_parts = spec.split('__', 1)
+    if (spec.startswith('__') and spec.endswith('__')):
+        # It's a dunder method; don't split it.
+        name_parts = [spec]
+    else:
+        name_parts = spec.split('__', 1)
 
     value = getattr(model_instance, name_parts[0])
     if callable(value):
