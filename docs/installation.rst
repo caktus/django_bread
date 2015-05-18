@@ -25,5 +25,6 @@ Django
 * In any template where you're using Bread views, load bread's javascript
   files, using something like::
 
-      <script src="{% static 'js/bread.js' %}"></script>
       <script src="{% static 'js/URI.js' %}"></script>
+      <script src="{% static 'js/bread.js' %}"></script>
+

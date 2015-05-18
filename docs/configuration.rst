@@ -177,7 +177,7 @@ sorting
     The default browse template will include sort controls on the column headers
     for columns that are sortable.
 
-    If the second item in the column entry for a column is not a valid specification
+    If the second item in the ``columns`` entry for a column is not a valid specification
     for sorting on that column (e.g. it might refer to a method on the model), then
     you can add a third item to that column entry to provide a sort spec. E.g.
     ``('Office', 'name', 'name_english')``.
@@ -185,7 +185,7 @@ sorting
     If there's a GET query parameter named ``o``, then its value will be split on
     commas, and each item should be a column number (0-based) optionally prefixed
     with '-'.  Any column whose number is included with '-' will be sorted
-    descending, while any column whose number is included without '+' will be sorted
+    descending, while any column whose number is included without '-' will be sorted
     ascending. The first column mentioned will be the primary sort column and so on.
 
     Also if there's an ``o`` parameter, there will be an ``o`` variable in the
