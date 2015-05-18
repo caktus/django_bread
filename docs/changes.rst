@@ -3,6 +3,12 @@
 Change Log
 ==========
 
+0.1.5 - May 14, 2015
+--------------------
+
+* Fix displaying search parameter in search field with results
+* Fix filters disappearing if there are no results
+
 0.1.4 - May 7, 2015
 -------------------
 

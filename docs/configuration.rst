@@ -132,7 +132,8 @@ columns
     in the browse view. 'attrname' may include '__' to drill down into fields,
     e.g. 'user__name' to get the user's name, or 'type__get_number_display' to
     call get_number_display() on the object from the type field.  (Assumes
-    the default template, obviously).
+    the default template, obviously). 'attrname' may also be a dunder method
+    like `__unicode__` or `__len__`.
 
 filterset
     filterset class to use to control filtering. Must be a subclass

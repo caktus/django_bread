@@ -77,7 +77,7 @@ class HasRequiredArgsTestCase(TestCase):
 class GetModelFieldTestCase(TestCase):
     def test_it(self):
         obj2 = BreadTestModel2.objects.create(
-            text="Rinocerous"
+            text="Rhinocerous"
         )
         obj1 = BreadTestModel.objects.create(
             name="Rudy Vallee", other=obj2
@@ -87,6 +87,9 @@ class GetModelFieldTestCase(TestCase):
 
         self.assertEqual(obj2.text, get_model_field(obj1, 'other__text'))
         self.assertEqual(obj2.text, get_model_field(obj1, 'other__get_text'))
+
+        # Prove that we can call a dunder method.
+        self.assertEqual(obj1.name, get_model_field(obj1, '__str__'))
 
 
 class ValidateFieldspecTestCase(TestCase):

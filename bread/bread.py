@@ -282,9 +282,12 @@ class BrowseView(BreadViewMixin, ListView):
         o = self.request.GET.get('o', False)
         if o:
             data['o'] = o
+        q = self.request.GET.get('q', False)
+        if q:
+            data['q'] = q
         data['columns'] = self.columns
         data['valid_sorting_columns_json'] = json.dumps(self._valid_sorting_columns)
-        data['has_filter'] = bool(self.filter)
+        data['has_filter'] = self.filterset is not None
         data['has_search'] = bool(self.search_fields)
         if self.search_fields and self.search_terms:
             data['search_terms'] = self.search_terms
