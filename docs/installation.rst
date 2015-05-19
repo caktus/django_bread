@@ -17,3 +17,14 @@ Then run::
     pip -r requirements.txt
 
 as usual.
+
+Django
+------
+
+* Add 'bread' to your ``INSTALLED_APPS``
+* In any template where you're using Bread views, load bread's javascript
+  files, using something like::
+
+      <script src="{% static 'js/URI.js' %}"></script>
+      <script src="{% static 'js/bread.js' %}"></script>
+
