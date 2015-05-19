@@ -49,23 +49,22 @@ function get_fresh_ordering_link(current_o, column_number, dir) {
     return URI(window.location.href).setQuery('o', parts.join(',')).href();
 }
 
-function update_th(column_number, link, marker) {
+function update_th(column_number, link, attrs, classes) {
     "use strict";
     /* Find the column_number-th th element and change it to be
-       a link to `link`, also inserting `marker` at the end if provided.
+       a link to `link`, also adding any CSS classes (classes should
+       be a string with space-separated class names), and setting
+       or updating any attributes (attrs should be a dictionary).
      */
     var new_html, $new_html, $th;
     $th = $($('th.col_header')[column_number]);
     new_html = document.createElement('a');
     $new_html = $(new_html);
     $new_html.attr('href', link);
-    if (marker) {
-        $new_html.html($th.html() + ' (' + marker + ")");
-    } else {
-        $new_html.html($th.html());
-    }
+    $new_html.html($th.html());
     $th.html(new_html);
-    $th.addClass('sortable');
+    $th.addClass(classes);
+    $th.attr(attrs);
 }
 
 function update_th_headers() {
@@ -74,7 +73,7 @@ function update_th_headers() {
         table and modifies them to show the current sorting and so that clicking the
         column headers changes the sorting.
      */
-    var columns_done = {}, sort_parm_index, sortspec, o_parms, direction, link, marker, column_number, num_columns;
+    var columns_done = {}, sort_parm_index, sortspec, o_parms, direction, link, marker, column_number, num_columns, classes;
     if (o_field) {
         o_parms = split(o_field, ',');
         // Process the columns mentioned in the current ordering spec
@@ -83,21 +82,23 @@ function update_th_headers() {
             column_number = Math.abs(Number(sortspec));
             /* Skip if column is not sortable */
             if (valid_sorting_columns.indexOf(column_number) !== -1) {
+                classes = 'sortable';
                 direction = sortspec.match(/^-/) ? 'd' : 'a';
                 if (direction === 'a') {
-                    marker = (sort_parm_index + 1) + '&nbsp;▲';
+                    classes = classes + ' sortasc';
                     /* If they click on a column that's currently sorted ascending,
                        change it to descending.
                      */
                     link = get_fresh_ordering_link(o_field, column_number, 'd');
                 } else {
+                    classes = classes + ' sortdesc';
                     marker = (sort_parm_index + 1) + '&nbsp;▼';
                     /* If they click on a column that's currently sorted descending,
                        change it to unsorted.
                      */
                     link = get_fresh_ordering_link(o_field, column_number, '');
                 }
-                update_th(column_number, link, marker);
+                update_th(column_number, link, {'sort_column': sort_parm_index + 1}, classes);
             }
             columns_done[column_number] = true;
         }
@@ -113,7 +114,7 @@ function update_th_headers() {
                    change it to sort ascending.
                  */
                 link = get_fresh_ordering_link(o_field, column_number, 'a');
-                update_th(column_number, link);
+                update_th(column_number, link, {}, 'sortable unsorted');
             }
         }
     }
