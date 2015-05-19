@@ -85,13 +85,13 @@ function update_th_headers() {
             if (valid_sorting_columns.indexOf(column_number) !== -1) {
                 direction = sortspec.match(/^-/) ? 'd' : 'a';
                 if (direction === 'a') {
-                    marker = (sort_parm_index + 1) + ' ▲';
+                    marker = (sort_parm_index + 1) + '&nbsp;▲';
                     /* If they click on a column that's currently sorted ascending,
                        change it to descending.
                      */
                     link = get_fresh_ordering_link(o_field, column_number, 'd');
                 } else {
-                    marker = (sort_parm_index + 1) + ' ▼';
+                    marker = (sort_parm_index + 1) + '&nbsp;▼';
                     /* If they click on a column that's currently sorted descending,
                        change it to unsorted.
                      */
