@@ -134,7 +134,7 @@ class BreadViewMixin(object):
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified
         query parms updated or added"""
-        request_kwargs = dict(self.request.GET)
+        request_kwargs = self.request.GET.copy()
         request_kwargs.update(query_parms)
         return self.request.path + "?" + urlencode(request_kwargs, doseq=True)
 
