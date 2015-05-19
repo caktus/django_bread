@@ -174,6 +174,38 @@ search_terms
     Then ``search_terms`` will be available in the browse template context to help
     the user understand how their search will work.
 
+sorting
+    The default browse template will include sort controls on the column headers
+    for columns that are sortable.
+
+    If the second item in the ``columns`` entry for a column is not a valid specification
+    for sorting on that column (e.g. it might refer to a method on the model), then
+    you can add a third item to that column entry to provide a sort spec. E.g.
+    ``('Office', 'name', 'name_english')``.
+
+    If there's a GET query parameter named ``o``, then its value will be split on
+    commas, and each item should be a column number (0-based) optionally prefixed
+    with '-'.  Any column whose number is included with '-' will be sorted
+    descending, while any column whose number is included without '-' will be sorted
+    ascending. The first column mentioned will be the primary sort column and so on.
+
+    Also if there's an ``o`` parameter, there will be an ``o`` variable in the
+    template context containing the value of it.
+
+    Finally, there will be a context variable named ``valid_sorting_columns_json``
+    which is a JSON string containing a list of the indexes of the columns that are
+    valid to sort on.
+
+    If you're not using the default bread templates or at least
+    ``bread/includes/browse.html``, be sure to give your ``th`` elements a
+    class of ``col_header`` and to include this javascript snippet::
+
+        <script>
+          var o_field = "{{o}}",
+              valid_sorting_columns = JSON.parse("{{ valid_sorting_columns_json }}");
+        </script>
+
+
 Read view configuration
 -----------------------
 
