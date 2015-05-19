@@ -279,8 +279,8 @@ class BrowseView(BreadViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
-        data['o'] = self.request.GET.get('o', False)
-        data['q'] = self.request.GET.get('q', False)
+        data['o'] = self.request.GET.get('o', '')
+        data['q'] = self.request.GET.get('q', '')
         data['columns'] = self.columns
         data['valid_sorting_columns_json'] = json.dumps(self._valid_sorting_columns)
         data['has_filter'] = self.filterset is not None
