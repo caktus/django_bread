@@ -3,6 +3,11 @@
 Change Log
 ==========
 
+0.1.6 - May 19, 2015
+--------------------
+
+* Sortable columns in browse view
+
 0.1.5 - May 14, 2015
 --------------------
 
