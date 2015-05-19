@@ -65,6 +65,7 @@ function update_th(column_number, link, marker) {
         $new_html.html($th.html());
     }
     $th.html(new_html);
+    $th.addClass('sortable');
 }
 
 function update_th_headers() {

@@ -205,6 +205,10 @@ sorting
               valid_sorting_columns = JSON.parse("{{ valid_sorting_columns_json }}");
         </script>
 
+    Also note that any ``th`` element that has a sorting link added will
+    also have the ``sortable`` CSS class added to it, in case you want to
+    style it differently.
+
 
 Read view configuration
 -----------------------
