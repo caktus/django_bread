@@ -221,7 +221,7 @@ sorting
     CSS class added to it, in case you want to style it differently.
 
     Additionally, a ``th`` element on a column that is sorted ascending will have
-    the ``sortasc`` class, or if sorted descending the ``sortdesc`` class, or
+    the ``sort_asc`` class, or if sorted descending the ``sort_desc`` class, or
     if sortable but not current sorted, the ``unsorted`` class.
 
     Also, the ``th`` will have an attribute added, ``sort_column``, whose value
