@@ -178,10 +178,14 @@ sorting
     The default browse template will include sort controls on the column headers
     for columns that are sortable.
 
+    Configuring the browse view:
+
     If the second item in the ``columns`` entry for a column is not a valid specification
     for sorting on that column (e.g. it might refer to a method on the model), then
     you can add a third item to that column entry to provide a sort spec. E.g.
     ``('Office', 'name', 'name_english')``.
+
+    Query parameters:
 
     If there's a GET query parameter named ``o``, then its value will be split on
     commas, and each item should be a column number (0-based) optionally prefixed
@@ -189,10 +193,16 @@ sorting
     descending, while any column whose number is included without '-' will be sorted
     ascending. The first column mentioned will be the primary sort column and so on.
 
-    Also if there's an ``o`` parameter, there will be an ``o`` variable in the
-    template context containing the value of it.
+    (Typically links are generated for you by Bread's Javascript, so you don't
+    have to come up with these query parameters yourself.)
 
-    Finally, there will be a context variable named ``valid_sorting_columns_json``
+    Template context variables:
+
+    If there's an ``o`` query parameter, there will be an ``o`` variable in the
+    template context containing the value of it.  Otherwise, the ``o`` variable
+    will exist but contain an empty string.
+
+    There will be a context variable named ``valid_sorting_columns_json``
     which is a JSON string containing a list of the indexes of the columns that are
     valid to sort on.
 
@@ -204,6 +214,35 @@ sorting
           var o_field = "{{o}}",
               valid_sorting_columns = JSON.parse("{{ valid_sorting_columns_json }}");
         </script>
+
+    Styling:
+
+    Any ``th`` element on a column that can be sorted will have the ``sortable``
+    CSS class added to it, in case you want to style it differently.
+
+    Additionally, a ``th`` element on a column that is sorted ascending will have
+    the ``sort_asc`` class, or if sorted descending the ``sort_desc`` class, or
+    if sortable but not current sorted, the ``unsorted`` class.
+
+    Also, the ``th`` will have an attribute added, ``sort_column``, whose value
+    will be ``1`` on the primary sort column, ``2`` on the secondary sort column,
+    etc.
+
+    This allows styling the columns with CSS like this::
+
+        th.sortable.unsorted::after {
+            content: "\00A0▲▼";
+            opacity: 0.2;
+        }
+        table th.sortable.sortasc::after {
+            content: "\00A0(" attr(sort_column)  "▲)";
+        }
+        table th.sortable.sortdesc::after {
+            content: "\00A0(" attr(sort_column)  "▼)";
+        }
+
+    which will put " (1▲)" after the header on the primary sorting column if it's
+    ascending, etc.
 
 
 Read view configuration

@@ -134,7 +134,7 @@ class BreadViewMixin(object):
     def _get_new_url(self, **query_parms):
         """Return a new URL consisting of this request's URL, with any specified
         query parms updated or added"""
-        request_kwargs = dict(self.request.GET)
+        request_kwargs = self.request.GET.copy()
         request_kwargs.update(query_parms)
         return self.request.path + "?" + urlencode(request_kwargs, doseq=True)
 
@@ -279,18 +279,16 @@ class BrowseView(BreadViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
-        o = self.request.GET.get('o', False)
-        if o:
-            data['o'] = o
-        q = self.request.GET.get('q', False)
-        if q:
-            data['q'] = q
+        data['o'] = self.request.GET.get('o', '')
+        data['q'] = self.request.GET.get('q', '')
         data['columns'] = self.columns
         data['valid_sorting_columns_json'] = json.dumps(self._valid_sorting_columns)
         data['has_filter'] = self.filterset is not None
         data['has_search'] = bool(self.search_fields)
         if self.search_fields and self.search_terms:
             data['search_terms'] = self.search_terms
+        else:
+            data['search_terms'] = ''
         data['filter'] = self.filter
         if data.get('is_paginated', False):
             page = data['page_obj']

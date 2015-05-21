@@ -1,3 +1,4 @@
+# coding: utf-8
 from six.moves.http_client import OK
 
 from tests.base import BreadTestCase
@@ -79,3 +80,13 @@ class BreadSearchTestCase(BreadTestCase):
         objs = self.get_search_results(q='joe')
         obj_ids = [obj.id for obj in objs]
         self.assertEqual([self.joe.id], obj_ids)
+
+    def test_nonascii_search(self):
+        # This was failing if we were also paginating
+        BreadTestModelFactory(name=u'قمر')
+        BreadTestModelFactory(name=u'قمر')
+        try:
+            self.bread.browse_view.paginate_by = 1
+            self.get_search_results(q=u'قمر')
+        finally:
+            self.bread.browse_view.paginate_by = None
