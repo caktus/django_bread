@@ -3,6 +3,13 @@
 Change Log
 ==========
 
+0.1.7 - May 21, 2015
+--------------------
+
+* Tweaks to sorting (includes breaking changes to how sorted columns
+  are formatted; see docs).
+* Fix searches with non-ASCII characters.
+
 0.1.6 - May 19, 2015
 --------------------
 
