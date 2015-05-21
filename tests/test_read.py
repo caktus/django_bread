@@ -63,7 +63,8 @@ class BreadLabelValueReadTest(BreadTestCase):
                 (None, 'banana'),                    # Same, also test field w/explicit verbose_name
                 ('eman', 'name_reversed'),           # Mode 2
                 ('Foo', 'bar'),                      # Mode 3
-                ('context first key', lambda context_data: list(context_data.keys())[0]),  # Mode 4
+                # Mode 4 below
+                ('context first key', lambda context_data: sorted(context_data.keys())[0]),
                 ('Answer', 42),                      # Mode 5
             ]
 
@@ -99,7 +100,7 @@ class BreadLabelValueReadTest(BreadTestCase):
 
         # Test get_field_label_value() by checking the rendering of the the 5 fields of
         # TestLabelValueBreadReadView.
-        key = list(rsp.context_data.keys())[0]
+        key = sorted(rsp.context_data.keys())[0]
         for expected in (
             "<label>Id</label>: <span class='value'>{}</span>".format(item.id),
             "<label>A Yellow Fruit</label>: <span class='value'>0</span>",
