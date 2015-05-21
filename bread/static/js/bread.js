@@ -77,7 +77,7 @@ $(function () {
          column headers changes the sorting.
          */
         var columns_done = {}, sort_parm_index, sortspec, o_parms, direction, link, column_number, num_columns, classes, next_direction, attrs;
-        if (o_field) {
+        if ('o_field' in window && o_field) {
             o_parms = split(o_field, ',');
             // Process the columns mentioned in the current ordering spec
             for (sort_parm_index = 0; sort_parm_index < o_parms.length; sort_parm_index += 1) {
