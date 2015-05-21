@@ -3,6 +3,12 @@
 Change Log
 ==========
 
+0.1.8 - May 21, 2015
+--------------------
+
+* Fix template so files can be uploaded from forms
+* Fix javascript to not fail if `o_field` is not defined.
+
 0.1.7 - May 21, 2015
 --------------------
 
