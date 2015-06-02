@@ -563,7 +563,6 @@ class Bread(object):
         return self.read_view.as_view(
             bread=self,
             model=self.model,
-            form_class=self.form_class,
         )
 
     #####
@@ -576,7 +575,6 @@ class Bread(object):
         return self.edit_view.as_view(
             bread=self,
             model=self.model,
-            form_class=self.form_class,
         )
 
     #####
@@ -589,7 +587,6 @@ class Bread(object):
         return self.add_view.as_view(
             bread=self,
             model=self.model,
-            form_class=self.form_class,
         )
 
     #####
