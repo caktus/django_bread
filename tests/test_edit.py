@@ -1,8 +1,11 @@
 from six.moves.http_client import FOUND, BAD_REQUEST, OK
 
 from django.core.urlresolvers import reverse
+from django import forms
 
+from bread.bread import EditView, Bread
 from .base import BreadTestCase
+from .models import BreadTestModel
 
 
 class BreadEditTest(BreadTestCase):
@@ -54,3 +57,28 @@ class BreadEditTest(BreadTestCase):
         rsp.render()
         body = rsp.content.decode('utf-8')
         self.assertIn('method="POST"', body)
+
+    def test_setting_form_class(self):
+        class DummyForm(forms.Form):
+            pass
+
+        glob = {}
+
+        class TestView(EditView):
+            form_class = DummyForm
+
+            # To get hold of a reference to the actual view object created by
+            # bread, use a fake dispatch method that saves 'self' into a
+            # dictionary we can access in the test.
+            def dispatch(self, *args, **kwargs):
+                glob['view_object'] = self
+
+        class BreadTest(Bread):
+            model = BreadTestModel
+            edit_view = TestView
+
+        bread = BreadTest()
+        view_function = bread.get_edit_view()
+        # Call the view function to invoke dispatch so we can get to the view itself
+        view_function(None, None, None)
+        self.assertEqual(DummyForm, glob['view_object'].form_class)

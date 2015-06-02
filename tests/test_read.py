@@ -1,12 +1,13 @@
 from six.moves.http_client import OK, METHOD_NOT_ALLOWED
 
 from django.core.urlresolvers import reverse
+from django import forms
 from django.http import Http404
 
+from bread.bread import LabelValueReadView, Bread, ReadView
 from .base import BreadTestCase
-from .models import BreadLabelValueTestModel
+from .models import BreadLabelValueTestModel, BreadTestModel
 from .factories import BreadLabelValueTestModelFactory
-from bread.bread import LabelValueReadView, Bread
 
 
 class BreadReadTest(BreadTestCase):
@@ -63,7 +64,8 @@ class BreadLabelValueReadTest(BreadTestCase):
                 (None, 'banana'),                    # Same, also test field w/explicit verbose_name
                 ('eman', 'name_reversed'),           # Mode 2
                 ('Foo', 'bar'),                      # Mode 3
-                ('context first key', lambda context_data: list(context_data.keys())[0]),  # Mode 4
+                # Mode 4 below
+                ('context first key', lambda context_data: sorted(context_data.keys())[0]),
                 ('Answer', 42),                      # Mode 5
             ]
 
@@ -99,7 +101,7 @@ class BreadLabelValueReadTest(BreadTestCase):
 
         # Test get_field_label_value() by checking the rendering of the the 5 fields of
         # TestLabelValueBreadReadView.
-        key = list(rsp.context_data.keys())[0]
+        key = sorted(rsp.context_data.keys())[0]
         for expected in (
             "<label>Id</label>: <span class='value'>{}</span>".format(item.id),
             "<label>A Yellow Fruit</label>: <span class='value'>0</span>",
@@ -109,3 +111,28 @@ class BreadLabelValueReadTest(BreadTestCase):
             "<label>Answer</label>: <span class='value'>42</span>",
                 ):
             self.assertContains(rsp, expected)
+
+    def test_setting_form_class(self):
+        class DummyForm(forms.Form):
+            pass
+
+        glob = {}
+
+        class TestView(ReadView):
+            form_class = DummyForm
+
+            # To get hold of a reference to the actual view object created by
+            # bread, use a fake dispatch method that saves 'self' into a
+            # dictionary we can access in the test.
+            def dispatch(self, *args, **kwargs):
+                glob['view_object'] = self
+
+        class BreadTest(Bread):
+            model = BreadTestModel
+            read_view = TestView
+
+        bread = BreadTest()
+        view_function = bread.get_read_view()
+        # Call the view function to invoke dispatch so we can get to the view itself
+        view_function(None, None, None)
+        self.assertEqual(DummyForm, glob['view_object'].form_class)
