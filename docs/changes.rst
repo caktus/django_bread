@@ -3,6 +3,11 @@
 Change Log
 ==========
 
+0.1.9 - Jun 2, 2015
+-------------------
+
+* Fix setting form_class on individual views (#55)
+
 0.1.8 - May 21, 2015
 --------------------
 
