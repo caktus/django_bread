@@ -18,6 +18,7 @@ class BreadBrowseTest(BreadTestCase):
         rsp = self.bread.get_browse_view()(request)
         self.assertEqual(OK, rsp.status_code)
         rsp.render()
+        self.assertTrue(rsp.context_data['bread_test_class'])
         body = rsp.content.decode('utf-8')
         for item in items:
             self.assertIn(item.name, body)

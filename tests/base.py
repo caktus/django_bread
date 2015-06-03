@@ -50,6 +50,11 @@ class BreadTestCase(TestCase):
             namespace = self.url_namespace
             plural_name = 'testmodels'
 
+            def get_additional_context_data(self):
+                context = super(BreadTestClass, self).get_additional_context_data()
+                context['bread_test_class'] = True
+                return context
+
         for k, v in self.extra_bread_attributes.items():
             setattr(BreadTestClass, k, v)
 

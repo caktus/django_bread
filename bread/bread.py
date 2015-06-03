@@ -140,15 +140,9 @@ class BreadViewMixin(object):
 
     def get_context_data(self, **kwargs):
         data = super(BreadViewMixin, self).get_context_data(**kwargs)
-        # Include reference to the Bread object in template contexts
-        data['bread'] = self.bread
 
-        # Provide references to useful Model Meta attributes
-        data['verbose_name'] = self.model._meta.verbose_name
-        data['verbose_name_plural'] = self.model._meta.verbose_name_plural
-
-        # Template that the default bread templates should extend
-        data['base_template'] = self.bread.base_template
+        # Add data from the Bread object
+        data.update(self.bread.get_additional_context_data())
 
         # Add 'may_<viewname>' to the context for each view, so the templates can
         # tell if the current user may use the named view.
@@ -537,6 +531,22 @@ class Bread(object):
         if hasattr(self, 'filterset'):
             raise ValueError("The 'filterset' setting should be on the BrowseView, not "
                              "the Bread view.")
+
+    def get_additional_context_data(self):
+        """
+        This returns a dictionary which will be added to each view's context data.
+        Any class subclassing bread should be sure to call its superclass method
+        and include the results.
+        """
+        data = {}
+        data['bread'] = self
+        # Provide references to useful Model Meta attributes
+        data['verbose_name'] = self.model._meta.verbose_name
+        data['verbose_name_plural'] = self.model._meta.verbose_name_plural
+
+        # Template that the default bread templates should extend
+        data['base_template'] = self.base_template
+        return data
 
     #####
     # B #

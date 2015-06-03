@@ -28,6 +28,7 @@ class BreadReadTest(BreadTestCase):
 
         self.assertEqual(OK, rsp.status_code)
         rsp.render()
+        self.assertTrue(rsp.context_data['bread_test_class'])
         body = rsp.content.decode('utf-8')
         self.assertIn(item.name, body)
 
