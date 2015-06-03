@@ -3,6 +3,11 @@
 Change Log
 ==========
 
+0.2.0 - Jun 3, 2015
+-------------------
+
+* Add Bread.get_additional_context_data(). (#57)
+
 0.1.9 - Jun 2, 2015
 -------------------
 
