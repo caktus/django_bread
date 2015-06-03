@@ -35,6 +35,7 @@ class BreadEditTest(BreadTestCase):
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
         self.assertEqual(BAD_REQUEST, rsp.status_code)
+        self.assertTrue(rsp.context_data['bread_test_class'])
         context = rsp.context_data
         form = context['form']
         errors = form.errors

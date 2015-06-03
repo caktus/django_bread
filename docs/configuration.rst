@@ -32,6 +32,15 @@ Here are some of those common parameters.
 model (required)
     The model class
 
+get_additional_context_data
+    Override this method to add data to the template context for all views.
+    You must include the data provided by Bread too, e.g.::
+
+        def get_additional_context_data(self):
+            context = super().get_additional_context_data()
+            context['my_var'] = compute_my_value()
+            return context
+
 exclude
     A list of names of fields to always exclude from any form classes that
     Bread generates itself. (Not used for any views that have a custom form

@@ -36,6 +36,7 @@ class BreadAddTest(BreadTestCase):
         rsp = view(request)
         self.assertEqual(BAD_REQUEST, rsp.status_code)
         context = rsp.context_data
+        self.assertTrue(context['bread_test_class'])
         form = context['form']
         errors = form.errors
         self.assertIn('name', errors)
