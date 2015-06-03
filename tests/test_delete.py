@@ -21,6 +21,7 @@ class BreadDeleteTest(BreadTestCase):
         request.user = self.user
         view = self.bread.get_delete_view()
         rsp = view(request, pk=self.item.pk)
+        self.assertTrue(rsp.context_data['bread_test_class'])
         self.assertEqual(OK, rsp.status_code)
         self.assertTrue(self.model.objects.filter(pk=self.item.pk).exists())
 
