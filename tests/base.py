@@ -50,8 +50,8 @@ class BreadTestCase(TestCase):
             namespace = self.url_namespace
             plural_name = 'testmodels'
 
-            def additional_context_data(self):
-                context = super(BreadTestClass, self).additional_context_data()
+            def get_additional_context_data(self):
+                context = super(BreadTestClass, self).get_additional_context_data()
                 context['bread_test_class'] = True
                 return context
 

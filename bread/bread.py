@@ -142,7 +142,7 @@ class BreadViewMixin(object):
         data = super(BreadViewMixin, self).get_context_data(**kwargs)
 
         # Add data from the Bread object
-        data.update(self.bread.additional_context_data())
+        data.update(self.bread.get_additional_context_data())
 
         # Add 'may_<viewname>' to the context for each view, so the templates can
         # tell if the current user may use the named view.
@@ -532,7 +532,7 @@ class Bread(object):
             raise ValueError("The 'filterset' setting should be on the BrowseView, not "
                              "the Bread view.")
 
-    def additional_context_data(self):
+    def get_additional_context_data(self):
         """
         This returns a dictionary which will be added to each view's context data.
         Any class subclassing bread should be sure to call its superclass method
