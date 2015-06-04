@@ -1,6 +1,7 @@
 import logging
 
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 
 from bread.utils import get_model_field
 
@@ -19,5 +20,7 @@ def getter(value, arg):
     """
     try:
         return get_model_field(value, arg)
+    except ObjectDoesNotExist:
+        pass
     except:
         logger.exception("Something blew up: %s|getter:%s" % (value, arg))

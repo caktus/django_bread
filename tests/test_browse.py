@@ -1,6 +1,11 @@
 from six.moves.http_client import OK, METHOD_NOT_ALLOWED, BAD_REQUEST
 
 from django.core.urlresolvers import reverse
+try:
+    # Python 3
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 from bread.bread import BrowseView
 from .base import BreadTestCase
@@ -8,7 +13,8 @@ from .factories import BreadTestModelFactory
 
 
 class BreadBrowseTest(BreadTestCase):
-    def test_get(self):
+    @patch('bread.templatetags.bread_tags.logger')
+    def test_get(self, mock_logger):
         self.set_urls(self.bread)
         items = [BreadTestModelFactory() for __ in range(5)]
         self.give_permission('browse')
@@ -22,6 +28,8 @@ class BreadBrowseTest(BreadTestCase):
         body = rsp.content.decode('utf-8')
         for item in items:
             self.assertIn(item.name, body)
+        # No exceptions logged
+        self.assertFalse(mock_logger.exception.called)
 
     def test_get_empty_list(self):
         self.set_urls(self.bread)
@@ -42,7 +50,8 @@ class BreadBrowseTest(BreadTestCase):
         rsp = self.bread.get_browse_view()(request)
         self.assertEqual(METHOD_NOT_ALLOWED, rsp.status_code)
 
-    def test_sort_all_ascending(self):
+    @patch('bread.templatetags.bread_tags.logger')
+    def test_sort_all_ascending(self, mock_logger):
         self.set_urls(self.bread)
         BreadTestModelFactory(name='999', other__text='012')
         BreadTestModelFactory(name='555', other__text='333')
@@ -61,8 +70,11 @@ class BreadBrowseTest(BreadTestCase):
             sortB = (results[i+1].name, results[i+1].other.text)
             self.assertLessEqual(sortA, sortB)
             i += 1
+        # No exceptions logged
+        self.assertFalse(mock_logger.exception.called)
 
-    def test_sort_all_descending(self):
+    @patch('bread.templatetags.bread_tags.logger')
+    def test_sort_all_descending(self, mock_logger):
         self.set_urls(self.bread)
         BreadTestModelFactory(name='999', other__text='012')
         BreadTestModelFactory(name='555', other__text='333')
@@ -81,6 +93,8 @@ class BreadBrowseTest(BreadTestCase):
             sortB = (results[i+1].name, results[i+1].other.text)
             self.assertGreaterEqual(sortA, sortB)
             i += 1
+        # No exceptions logged
+        self.assertFalse(mock_logger.exception.called)
 
     def test_sort_first_ascending(self):
         self.set_urls(self.bread)
@@ -165,7 +179,8 @@ class BreadBrowseTest(BreadTestCase):
         self.assertEqual(d, results[3])
         self.assertEqual(e, results[4])
 
-    def test_sort_second_field_ascending_first_descending(self):
+    @patch('bread.templatetags.bread_tags.logger')
+    def test_sort_second_field_ascending_first_descending(self, mock_logger):
         self.set_urls(self.bread)
         d = BreadTestModelFactory(name='1', other__text='111')
         a = BreadTestModelFactory(name='999', other__text='000')
@@ -185,6 +200,8 @@ class BreadBrowseTest(BreadTestCase):
         self.assertEqual(c, results[2])
         self.assertEqual(d, results[3])
         self.assertEqual(e, results[4])
+        # No exceptions logged
+        self.assertFalse(mock_logger.exception.called)
 
 
 class BadSortTest(BreadTestCase):

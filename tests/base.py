@@ -35,12 +35,14 @@ class BreadTestCase(TestCase):
             columns = [
                 ('Name', 'name'),
                 ('Text', 'other__text'),
+                ('Model1', 'model1',)
                 ]
 
         class BrowseClass(BrowseView):
             columns = [
                 ('Name', 'name'),
-                ('Text', 'other__text')
+                ('Text', 'other__text'),
+                ('Model1', 'model1',)
             ]
 
         class BreadTestClass(Bread):
