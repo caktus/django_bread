@@ -1,10 +1,11 @@
+import six
 from six.moves.http_client import OK, METHOD_NOT_ALLOWED, BAD_REQUEST
 
 from django.core.urlresolvers import reverse
-try:
-    # Python 3
+
+if six.PY3:
     from unittest.mock import patch
-except ImportError:
+else:
     from mock import patch
 
 from bread.bread import BrowseView
