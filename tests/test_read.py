@@ -68,6 +68,7 @@ class BreadLabelValueReadTest(BreadTestCase):
                 # Mode 4 below
                 ('context first key', lambda context_data: sorted(context_data.keys())[0]),
                 ('Answer', 42),                      # Mode 5
+                ('Model2', 'model2'),                # Back through related name for one2one field
             ]
 
         class BreadTestClass(Bread):

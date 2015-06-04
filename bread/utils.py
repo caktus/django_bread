@@ -153,7 +153,7 @@ def validate_fieldspec(model, spec):
     else:
         # It's a field
         # Is it a key?
-        if field.rel:
+        if getattr(field, 'rel', False):
             # Yes, refers to another model
             if rest_of_spec:
                 # Recurse!
