@@ -3,6 +3,11 @@
 Change Log
 ==========
 
+0.2.1 - Jun 6, 2015
+-------------------
+
+* Handle exception from related object does not exist (#58)
+
 0.2.0 - Jun 3, 2015
 -------------------
 
