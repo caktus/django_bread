@@ -25,6 +25,10 @@ class BreadLabelValueTestModel(models.Model):
 
 class BreadTestModel2(models.Model):
     text = models.CharField(max_length=20)
+    label_model = models.OneToOneField(BreadLabelValueTestModel, null=True,
+                                       related_name='model2')
+    model1 = models.OneToOneField('BreadTestModel', null=True,
+                                  related_name='model1')
 
     def get_text(self):
         return self.text
