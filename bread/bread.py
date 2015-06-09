@@ -196,14 +196,15 @@ class BrowseView(BreadViewMixin, ListView):
         self._valid_sorting_columns = []
         for i in range(len(self.columns)):
             fieldspec = self.get_sort_field_name_for_column(i)
-            queryset = self.model.objects.order_by(fieldspec)
-            try:
-                # Force Django to build the query so it will validate the order_by args
-                str(queryset.query)
-            except FieldError:
-                pass
-            else:
-                self._valid_sorting_columns.append(i)
+            if fieldspec:
+                queryset = self.model.objects.order_by(fieldspec)
+                try:
+                    # Force Django to build the query so it will validate the order_by args
+                    str(queryset.query)
+                except FieldError:
+                    pass
+                else:
+                    self._valid_sorting_columns.append(i)
 
     def get_sort_field_name_for_column(self, column_number):
         """
