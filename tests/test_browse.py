@@ -1,3 +1,4 @@
+import json
 import six
 from six.moves.http_client import OK, METHOD_NOT_ALLOWED, BAD_REQUEST
 
@@ -224,3 +225,47 @@ class BadSortTest(BreadTestCase):
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
         self.assertEqual(BAD_REQUEST, rsp.status_code)
+
+
+class NotDisablingSortTest(BreadTestCase):
+    class BrowseClass(BrowseView):
+        columns = [
+            ('Name', 'name'),
+        ]
+    extra_bread_attributes = {
+        'browse_view': BrowseClass,
+    }
+
+    def test_sorting_on_column(self):
+        # 'name' is a valid column to sort on
+        # (we test this because otherwise the DisableSortTest test isn't valid)
+        self.set_urls(self.bread)
+        self.give_permission('browse')
+        url = reverse(self.bread.get_url_name('browse'))
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertEqual(OK, rsp.status_code)
+        rsp.render()
+        self.assertEqual([0], json.loads(rsp.context_data['valid_sorting_columns_json']))
+
+
+class DisableSortTest(BreadTestCase):
+    class BrowseClass(BrowseView):
+        columns = [
+            ('Name', 'name', False),
+        ]
+    extra_bread_attributes = {
+        'browse_view': BrowseClass,
+    }
+
+    def test_not_sorting_on_column(self):
+        self.set_urls(self.bread)
+        self.give_permission('browse')
+        url = reverse(self.bread.get_url_name('browse'))
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertEqual(OK, rsp.status_code)
+        rsp.render()
+        self.assertEqual([], json.loads(rsp.context_data['valid_sorting_columns_json']))

@@ -194,6 +194,10 @@ sorting
     you can add a third item to that column entry to provide a sort spec. E.g.
     ``('Office', 'name', 'name_english')``.
 
+    Alternatively, if the second item in the ``columns`` entry for a column is valid for
+    sorting, but you don't want the table to be sortable on that column, add a third
+    item with a value of ``False``, e.g. ``('Date', 'creation_date', False)``.
+
     Query parameters:
 
     If there's a GET query parameter named ``o``, then its value will be split on
