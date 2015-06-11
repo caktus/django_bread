@@ -3,6 +3,12 @@
 Change Log
 ==========
 
+0.2.3 - Jun 11, 2015
+--------------------
+
+* New release because 0.2.2 didn't have the right
+  version number internally.
+
 0.2.2 - Jun 9, 2015
 -------------------
 
