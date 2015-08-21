@@ -3,6 +3,11 @@
 Change Log
 ==========
 
+0.2.4 - Aug 21, 2015
+--------------------
+
+* Add migration to drop BreadTest table (#64)
+
 0.2.3 - Jun 11, 2015
 --------------------
 
