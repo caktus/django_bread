@@ -71,9 +71,9 @@ def get_verbose_name(an_object, field_name, title_cap=True):
 
     If field_name doesn't refer to a model field, raises a FieldDoesNotExist error.
     """
-    # get_field_by_name() can raise FieldDoesNotExist which I simply propogate up to the caller.
+    # get_field() can raise FieldDoesNotExist which I simply propogate up to the caller.
     try:
-        field = an_object._meta.get_field_by_name(field_name)[0]
+        field = an_object._meta.get_field(field_name)
     except TypeError:
         # TypeError happens if the caller is very confused and passes an unhashable type such
         # as {} or []. I convert that into a FieldDoesNotExist exception for simplicity.

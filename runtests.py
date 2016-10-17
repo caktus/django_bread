@@ -26,8 +26,11 @@ if not settings.configured:
         SITE_ID=1,
         SECRET_KEY='super-secret',
         # ROOT_URLCONF='selectable.tests.urls',
-        TEMPLATE_DIRS=[
-            'bread/templates',
+        TEMPLATES=[
+            {
+                "BACKEND": 'django.template.backends.django.DjangoTemplates',
+                "DIRS": ['bread/templates'],
+            }
         ],
     )
 
