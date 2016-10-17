@@ -4,14 +4,14 @@ from six.moves.http_client import OK, METHOD_NOT_ALLOWED, BAD_REQUEST
 
 from django.core.urlresolvers import reverse
 
+from bread.bread import BrowseView
+from .base import BreadTestCase
+from .factories import BreadTestModelFactory
+
 if six.PY3:
     from unittest.mock import patch
 else:
     from mock import patch
-
-from bread.bread import BrowseView
-from .base import BreadTestCase
-from .factories import BreadTestModelFactory
 
 
 class BreadBrowseTest(BreadTestCase):
