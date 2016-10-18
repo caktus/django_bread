@@ -3,6 +3,8 @@ import logging
 import sys
 
 from django.conf import settings
+from django import setup
+from django.test.utils import get_runner
 
 
 if not settings.configured:
@@ -24,14 +26,13 @@ if not settings.configured:
         SITE_ID=1,
         SECRET_KEY='super-secret',
         # ROOT_URLCONF='selectable.tests.urls',
-        TEMPLATE_DIRS = [
-            'bread/templates',
+        TEMPLATES=[
+            {
+                "BACKEND": 'django.template.backends.django.DjangoTemplates',
+                "DIRS": ['bread/templates'],
+            }
         ],
     )
-
-
-from django import setup
-from django.test.utils import get_runner
 
 
 def runtests():
