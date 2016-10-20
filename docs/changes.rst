@@ -3,6 +3,12 @@
 Change Log
 ==========
 
+0.3.0 - Oct 19, 2016
+--------------------
+
+* Add CI coverage for Python 3.5
+* Add support for Django 1.9 and 1.10
+
 0.2.4 - Aug 21, 2015
 --------------------
 
