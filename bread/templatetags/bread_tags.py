@@ -22,5 +22,5 @@ def getter(value, arg):
         return get_model_field(value, arg)
     except ObjectDoesNotExist:
         pass
-    except:
+    except Exception:
         logger.exception("Something blew up: %s|getter:%s" % (value, arg))

@@ -26,9 +26,13 @@ class BreadLabelValueTestModel(models.Model):
 class BreadTestModel2(models.Model):
     text = models.CharField(max_length=20)
     label_model = models.OneToOneField(BreadLabelValueTestModel, null=True,
-                                       related_name='model2')
+                                       related_name='model2',
+                                       on_delete=models.CASCADE,
+                                       )
     model1 = models.OneToOneField('BreadTestModel', null=True,
-                                  related_name='model1')
+                                  related_name='model1',
+                                  on_delete=models.CASCADE,
+                                  )
 
     def get_text(self):
         return self.text
@@ -37,7 +41,10 @@ class BreadTestModel2(models.Model):
 @python_2_unicode_compatible
 class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
-    other = models.ForeignKey(BreadTestModel2, blank=True, null=True)
+    other = models.ForeignKey(
+        BreadTestModel2, blank=True, null=True,
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         ordering = ['name']
