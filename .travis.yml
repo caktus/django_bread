@@ -1,3 +1,11 @@
+# Need 3 versions of Python
+addons:
+  apt:
+    packages:
+    - python2.7-dev
+    - python3.5-dev
+    - python3.6-dev
+
 language: python
 python:
   - "3.6"
@@ -8,3 +16,10 @@ install:
 script: tox
 # Adding sudo: False tells Travis to use their container-based infrastructure, which is somewhat faster.
 sudo: False
+
+# Test a sampling of combinations
+env:
+  - TOXENV=py27-18,py27-110,py27-111
+  - TOXENV=py35-18,py35-110,py35-111
+  - TOXENV=py36-18,py36-110,py36-111
+  - TOXENV=py27-pep8,py36-pep8
