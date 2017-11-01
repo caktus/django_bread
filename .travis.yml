@@ -31,7 +31,7 @@ script: tox
 
 # Test a sampling of combinations
 env:
-  - TOXENV=py27-18,py27-110,py27-111
-  - TOXENV=py35-18,py35-110,py35-111
-  - TOXENV=py36-18,py36-110,py36-111
+  - TOXENV=py27-django18,py27-django110,py27-django111
+  - TOXENV=py35-django18,py35-django110,py35-django111
+  - TOXENV=py36-django18,py36-django110,py36-django111
   - TOXENV=py27-pep8,py36-pep8
