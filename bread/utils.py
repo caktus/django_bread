@@ -28,11 +28,22 @@ resolves to is a callable, it will be called to get its return
 value, similar to how references to context variables in templates
 work.
 """
-from inspect import getargspec
+import six
 
 from django.core.exceptions import ValidationError
 from django.db.models import Model
 from django.db.models.fields import FieldDoesNotExist
+from django.db.models.fields.related import RelatedField
+
+from django import VERSION as django_version
+
+
+if django_version >= (1, 10):
+    def user_is_authenticated(user):
+        return user.is_authenticated
+else:
+    def user_is_authenticated(user):
+        return user.is_authenticated()
 
 
 def get_value_or_result(model_instance, attribute_name):
@@ -93,7 +104,12 @@ def has_required_args(func):
     """
     Return True if the function has any required arguments.
     """
-    spec = getargspec(func)
+    if six.PY2:
+        from inspect import getargspec
+        spec = getargspec(func)
+    else:
+        from inspect import getfullargspec
+        spec = getfullargspec(func)
     num_args = len(spec.args)
     # If first arg is 'self', we can ignore one arg
     if num_args and spec.args[0] == 'self':
@@ -153,11 +169,11 @@ def validate_fieldspec(model, spec):
     else:
         # It's a field
         # Is it a key?
-        if getattr(field, 'rel', False):
+        if isinstance(field, RelatedField):
             # Yes, refers to another model
             if rest_of_spec:
                 # Recurse!
-                validate_fieldspec(model=field.rel.to, spec=rest_of_spec)
+                validate_fieldspec(model=field.related_model, spec=rest_of_spec)
             # Well, it's okay if it just returns a reference to another record
         else:
             # Simple field
