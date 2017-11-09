@@ -11,6 +11,12 @@ Change Log
 * Drop support for Django 1.9 (no longer supported by Django)
 * Drop support for Python 3.4
 
+Supported versions in this release are:
+
+Django: 1.8, 1.10, 1.11
+Python: 2.7, 3.5, 3.6
+
+
 0.3.0 - Oct 19, 2016
 --------------------
 

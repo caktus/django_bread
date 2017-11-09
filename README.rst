@@ -10,6 +10,12 @@ pagination, and more.
 This is still very Alpha. We're starting to use it, but the documentation
 is very sketchy and the design is still evolving.
 
+Supported versions
+------------------
+
+Django: 1.8, 1.10, 1.11
+Python: 2.7, 3.5, 3.6
+
 Testing
 -------
 
