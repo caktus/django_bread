@@ -1,11 +1,19 @@
 from six.moves.http_client import FOUND, BAD_REQUEST, OK
 
-from django.core.urlresolvers import reverse
 from django import forms
 
 from bread.bread import AddView, Bread
 from .base import BreadTestCase
 from .models import BreadTestModel
+
+from django import VERSION as django_version
+if django_version >= (1, 10):
+    # Modern Django
+    from django.urls import reverse
+else:
+    # deprecated in 1.10
+    # django.core.urlresolvers to be removed in Django 2.0
+    from django.core.urlresolvers import reverse
 
 
 class BreadAddTest(BreadTestCase):

@@ -1,6 +1,7 @@
 from functools import reduce
 import json
 from operator import or_
+
 from six import string_types as six_string_types
 from six.moves.http_client import BAD_REQUEST
 from six.moves.urllib.parse import urlencode
@@ -13,14 +14,23 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied, FieldError
-from django.core.urlresolvers import reverse_lazy
 from django.db.models import Model, Q
 from django.db.models.sql import EmptyResultSet
 from django.forms.models import modelform_factory
 from django.http.response import HttpResponseBadRequest
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from .utils import validate_fieldspec, get_verbose_name
+from .utils import validate_fieldspec, get_verbose_name, user_is_authenticated
+
+
+from django import VERSION as django_version
+if django_version >= (1, 10):
+    # Modern Django
+    from django.urls import reverse_lazy
+else:
+    # deprecated in 1.10
+    # django.core.urlresolvers to be removed in Django 2.0
+    from django.core.urlresolvers import reverse_lazy
 
 
 class Http400(Exception):
@@ -94,7 +104,7 @@ class BreadViewMixin(object):
                 "'permission_required' attribute to be set.")
 
         # Check if the user is logged in
-        if not request.user.is_authenticated():
+        if not user_is_authenticated(request.user):
             return redirect_to_login(request.get_full_path(),
                                      settings.LOGIN_URL,
                                      REDIRECT_FIELD_NAME)
