@@ -80,7 +80,7 @@ class GetModelFieldTestCase(TestCase):
             text="Rhinocerous"
         )
         obj1 = BreadTestModel.objects.create(
-            name="Rudy Vallee", other=obj2
+            name="Rudy Vallee", other=obj2, age=72
         )
         self.assertEqual(obj1.name, get_model_field(obj1, 'name'))
         self.assertEqual(obj1.name, get_model_field(obj1, 'get_name'))

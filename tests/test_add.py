@@ -24,7 +24,7 @@ class BreadAddTest(BreadTestCase):
     def test_new_item(self):
         self.model.objects.all().delete()
         url = reverse(self.bread.get_url_name('add'))
-        request = self.request_factory.post(url, data={'name': 'Fred Jones'})
+        request = self.request_factory.post(url, data={'name': 'Fred Jones', 'age': '19'})
         request.user = self.user
         self.give_permission('add')
         view = self.bread.get_add_view()
@@ -37,7 +37,8 @@ class BreadAddTest(BreadTestCase):
     def test_fail_validation(self):
         self.model.objects.all().delete()
         url = reverse(self.bread.get_url_name('add'))
-        request = self.request_factory.post(url, data={'name': 'this name is too much long yeah'})
+        request = self.request_factory.post(
+            url, data={'name': 'this name is too much long yeah', 'age': '19'})
         request.user = self.user
         self.give_permission('add')
         view = self.bread.get_add_view()

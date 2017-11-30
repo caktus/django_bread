@@ -41,13 +41,17 @@ class BreadTestModel2(models.Model):
 @python_2_unicode_compatible
 class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
+    age = models.IntegerField()
     other = models.ForeignKey(
         BreadTestModel2, blank=True, null=True,
         on_delete=models.CASCADE,
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = [
+            'name',
+            '-age',  # If same name, sort oldest first
+        ]
         permissions = [
             ('read_breadtestmodel', 'can read BreadTestModel'),
             ('browse_breadtestmodel', 'can browse BreadTestModel'),

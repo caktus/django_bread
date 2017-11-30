@@ -55,9 +55,11 @@ class BreadBrowseTest(BreadTestCase):
     @patch('bread.templatetags.bread_tags.logger')
     def test_sort_all_ascending(self, mock_logger):
         self.set_urls(self.bread)
-        BreadTestModelFactory(name='999', other__text='012')
-        BreadTestModelFactory(name='555', other__text='333')
-        BreadTestModelFactory(name='111', other__text='555')
+        BreadTestModelFactory(name='999', other__text='012', age=50)
+        BreadTestModelFactory(name='555', other__text='333', age=60)
+        BreadTestModelFactory(name='111', other__text='555', age=10)
+        BreadTestModelFactory(name='111', other__text='555', age=20)
+        BreadTestModelFactory(name='111', other__text='555', age=5)
         self.give_permission('browse')
         url = reverse(self.bread.get_url_name('browse')) + '?o=0,1'
         request = self.request_factory.get(url)
@@ -71,6 +73,9 @@ class BreadBrowseTest(BreadTestCase):
             sortA = (results[i].name, results[i].other.text)
             sortB = (results[i+1].name, results[i+1].other.text)
             self.assertLessEqual(sortA, sortB)
+            if sortA == sortB:
+                # default sort is '-age'
+                self.assertGreaterEqual(results[i].age, results[i+1].age)
             i += 1
         # No exceptions logged
         self.assertFalse(mock_logger.exception.called)
@@ -78,9 +83,11 @@ class BreadBrowseTest(BreadTestCase):
     @patch('bread.templatetags.bread_tags.logger')
     def test_sort_all_descending(self, mock_logger):
         self.set_urls(self.bread)
-        BreadTestModelFactory(name='999', other__text='012')
-        BreadTestModelFactory(name='555', other__text='333')
-        BreadTestModelFactory(name='111', other__text='555')
+        BreadTestModelFactory(name='999', other__text='012', age=50)
+        BreadTestModelFactory(name='555', other__text='333', age=60)
+        BreadTestModelFactory(name='111', other__text='555', age=10)
+        BreadTestModelFactory(name='111', other__text='555', age=20)
+        BreadTestModelFactory(name='111', other__text='555', age=5)
         self.give_permission('browse')
         url = reverse(self.bread.get_url_name('browse')) + '?o=-0,-1'
         request = self.request_factory.get(url)
@@ -94,6 +101,9 @@ class BreadBrowseTest(BreadTestCase):
             sortA = (results[i].name, results[i].other.text)
             sortB = (results[i+1].name, results[i+1].other.text)
             self.assertGreaterEqual(sortA, sortB)
+            if sortA == sortB:
+                # default sort is '-age'
+                self.assertGreaterEqual(results[i].age, results[i+1].age)
             i += 1
         # No exceptions logged
         self.assertFalse(mock_logger.exception.called)
