@@ -187,6 +187,13 @@ sorting
     The default browse template will include sort controls on the column headers
     for columns that are sortable.
 
+    It's a good idea to define a default ordering in the model's ``Meta`` class.
+    After applying any sort columns specified by the user, Bread will add on any
+    default orderings not already mentioned. That will result in the overall sort
+    being stable, which is important if you want pagination to be sensible.
+    (Otherwise, every time we show a new page, we could be working off a different
+    sorting of the results!)  If nothing else, include a sort on the primary key.
+
     Configuring the browse view:
 
     If the second item in the ``columns`` entry for a column is not a valid specification

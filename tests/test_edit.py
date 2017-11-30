@@ -16,7 +16,7 @@ class BreadEditTest(BreadTestCase):
     def test_edit_item(self):
         item = self.model_factory()
         url = reverse(self.bread.get_url_name('edit'), kwargs={'pk': item.pk})
-        request = self.request_factory.post(url, data={'name': 'Fred Jones'})
+        request = self.request_factory.post(url, data={'name': 'Fred Jones', 'age': '19'})
         request.user = self.user
         self.give_permission('change')
         view = self.bread.get_edit_view()
@@ -29,7 +29,8 @@ class BreadEditTest(BreadTestCase):
     def test_fail_validation(self):
         item = self.model_factory()
         url = reverse(self.bread.get_url_name('edit'), kwargs={'pk': item.pk})
-        request = self.request_factory.post(url, data={'name': 'this name is too much long yeah'})
+        request = self.request_factory.post(
+            url, data={'name': 'this name is too much long yeah', 'age': '19'})
         request.user = self.user
         self.give_permission('change')
         view = self.bread.get_edit_view()

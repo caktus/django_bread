@@ -14,6 +14,7 @@ class BreadTestModelFactory(factory.DjangoModelFactory):
     FACTORY_FOR = BreadTestModel
 
     name = factory.fuzzy.FuzzyText(length=10)
+    age = factory.fuzzy.FuzzyInteger(low=1, high=99)
     other = factory.SubFactory(BreadTestModel2Factory)
 
 

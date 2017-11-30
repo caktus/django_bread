@@ -3,6 +3,12 @@
 Change Log
 ==========
 
+0.5.0 - Nov 30, 2017
+--------------------
+
+* Use models' default ordering to make pagination more stable
+  when user is sorting.
+
 0.4.0 - Oct 31, 2017
 --------------------
 
