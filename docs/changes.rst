@@ -3,6 +3,12 @@
 Change Log
 ==========
 
+0.5.1 - Dec 1, 2017
+-------------------
+
+* Allow specifying default ordering on views for cases when we
+  don't control the model and can't change the ordering there.
+
 0.5.0 - Nov 30, 2017
 --------------------
 

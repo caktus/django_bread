@@ -194,6 +194,10 @@ sorting
     (Otherwise, every time we show a new page, we could be working off a different
     sorting of the results!)  If nothing else, include a sort on the primary key.
 
+    If you do not have control of the model and so cannot change its ordering there,
+    you can add a ``default_ordering`` attribute to the browse view. Bread will use that
+    if present, instead of the model's ordering.
+
     Configuring the browse view:
 
     If the second item in the ``columns`` entry for a column is not a valid specification

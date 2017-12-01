@@ -81,6 +81,36 @@ class BreadBrowseTest(BreadTestCase):
         self.assertFalse(mock_logger.exception.called)
 
     @patch('bread.templatetags.bread_tags.logger')
+    def test_sort_most_ascending_with_override_default_order(self, mock_logger):
+        self.set_urls(self.bread)
+        self.bread.browse_view.default_ordering = ['-other__text', 'age']
+        BreadTestModelFactory(name='999', other__text='012', age=50)
+        BreadTestModelFactory(name='555', other__text='333', age=60)
+        BreadTestModelFactory(name='111', other__text='555', age=10)
+        BreadTestModelFactory(name='111', other__text='555', age=20)
+        BreadTestModelFactory(name='111', other__text='555', age=5)
+        self.give_permission('browse')
+        url = reverse(self.bread.get_url_name('browse')) + '?o=0,1'
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertEqual(OK, rsp.status_code)
+        rsp.render()
+        results = rsp.context_data['object_list']
+
+        i = 0
+        while i < len(results) - 1:
+            sortA = (results[i].name, results[i].other.text)
+            sortB = (results[i+1].name, results[i+1].other.text)
+            self.assertLessEqual(sortA, sortB)
+            if sortA == sortB:
+                # default sort is 'age'
+                self.assertLessEqual(results[i].age, results[i+1].age)
+            i += 1
+        # No exceptions logged
+        self.assertFalse(mock_logger.exception.called)
+
+    @patch('bread.templatetags.bread_tags.logger')
     def test_sort_all_descending(self, mock_logger):
         self.set_urls(self.bread)
         BreadTestModelFactory(name='999', other__text='012', age=50)
