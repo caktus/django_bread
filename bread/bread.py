@@ -265,8 +265,9 @@ class BrowseView(BreadViewMixin, ListView):
                                 (prefix, self.get_sort_field_name_for_column(column_number)))
             # Add any ordering from the model's Meta data that isn't already included.
             # That will make the rest of the sort stable, if the model has some default sort order.
+            default_ordering = getattr(self, 'default_ordering', qset.model._meta.ordering)
             order_by_without_leading_dashes = [x.lstrip('-') for x in order_by]
-            for order_spec in qset.model._meta.ordering:
+            for order_spec in default_ordering:
                 if order_spec.lstrip('-') not in order_by_without_leading_dashes:
                     order_by.append(order_spec)
             qset = qset.order_by(*order_by)
