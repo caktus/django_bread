@@ -14,7 +14,7 @@ or::
 
     urlpatterns = (
         ...,
-        url(r'', include(MyBread().get_urls()),
+        path('', include(MyBread().get_urls()),
         ...
     )
 
@@ -70,6 +70,6 @@ choosing, e.g.::
 
     urlpatterns = (
         ....
-        url(r'^things/', include(MyBread().get_urls(prefix=False)),
+        path('things/', include(MyBread().get_urls(prefix=False)),
         ...
     )

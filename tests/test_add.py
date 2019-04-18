@@ -1,19 +1,9 @@
-from six.moves.http_client import FOUND, BAD_REQUEST, OK
-
 from django import forms
+from django.urls import reverse
 
 from bread.bread import AddView, Bread
 from .base import BreadTestCase
 from .models import BreadTestModel
-
-from django import VERSION as django_version
-if django_version >= (1, 10):
-    # Modern Django
-    from django.urls import reverse
-else:
-    # deprecated in 1.10
-    # django.core.urlresolvers to be removed in Django 2.0
-    from django.core.urlresolvers import reverse
 
 
 class BreadAddTest(BreadTestCase):
@@ -29,7 +19,7 @@ class BreadAddTest(BreadTestCase):
         self.give_permission('add')
         view = self.bread.get_add_view()
         rsp = view(request)
-        self.assertEqual(FOUND, rsp.status_code)
+        self.assertEqual(302, rsp.status_code)
         self.assertEqual(reverse(self.bread.get_url_name('browse')), rsp['Location'])
         item = self.model.objects.get()
         self.assertEqual('Fred Jones', item.name)
@@ -43,7 +33,7 @@ class BreadAddTest(BreadTestCase):
         self.give_permission('add')
         view = self.bread.get_add_view()
         rsp = view(request)
-        self.assertEqual(BAD_REQUEST, rsp.status_code)
+        self.assertEqual(400, rsp.status_code)
         context = rsp.context_data
         self.assertTrue(context['bread_test_class'])
         form = context['form']
@@ -58,7 +48,7 @@ class BreadAddTest(BreadTestCase):
         self.give_permission('add')
         view = self.bread.get_add_view()
         rsp = view(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         form = rsp.context_data['form']
         self.assertFalse(form.is_bound)
         rsp.render()

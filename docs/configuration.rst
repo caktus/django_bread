@@ -15,7 +15,7 @@ The main class to subclass is ``Bread``::
 
 then you can add it to a URL config something like this::
 
-    url(r'^', include(MyBreadView().get_urls())),
+    path('', include(MyBreadView().get_urls())),
 
 See also :ref:`urls`.
 

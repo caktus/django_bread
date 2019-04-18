@@ -1,6 +1,4 @@
-from six.moves.http_client import OK, METHOD_NOT_ALLOWED
-
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 
 from bread.bread import BrowseView
@@ -30,7 +28,7 @@ class BreadPaginationTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         context = rsp.context_data
         object_list = context['object_list']
@@ -46,7 +44,7 @@ class BreadPaginationTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         context = rsp.context_data
         object_list = context['object_list']
@@ -72,7 +70,7 @@ class BreadPaginationTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         context = rsp.context_data
         paginator = context['paginator']
         self.assertEqual(1, paginator.num_pages)
@@ -85,7 +83,7 @@ class BreadPaginationTest(BreadTestCase):
         request = self.request_factory.post(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(METHOD_NOT_ALLOWED, rsp.status_code)
+        self.assertEqual(405, rsp.status_code)
 
     def test_next_url(self):
         # Make sure next_url includes other query params unaltered
@@ -97,7 +95,7 @@ class BreadPaginationTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         context = rsp.context_data
         next_url = context['next_url']
         # We don't know what order the query parms will end up in

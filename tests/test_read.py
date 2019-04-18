@@ -1,6 +1,4 @@
-from six.moves.http_client import OK, METHOD_NOT_ALLOWED
-
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django import forms
 from django.http import Http404
 
@@ -26,7 +24,7 @@ class BreadReadTest(BreadTestCase):
         view = self.bread.get_read_view()
         rsp = view(request, pk=item.pk)
 
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         self.assertTrue(rsp.context_data['bread_test_class'])
         body = rsp.content.decode('utf-8')
@@ -50,7 +48,7 @@ class BreadReadTest(BreadTestCase):
         request = self.request_factory.post(url)
         request.user = self.user
         rsp = self.bread.get_read_view()(request)
-        self.assertEqual(METHOD_NOT_ALLOWED, rsp.status_code)
+        self.assertEqual(405, rsp.status_code)
 
 
 class BreadLabelValueReadTest(BreadTestCase):
@@ -96,7 +94,7 @@ class BreadLabelValueReadTest(BreadTestCase):
         view = self.bread.get_read_view()
         rsp = view(request, pk=item.pk)
 
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         body = rsp.content.decode('utf-8')
         self.assertIn('bar', body)

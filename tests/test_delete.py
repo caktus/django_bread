@@ -1,6 +1,4 @@
-from six.moves.http_client import FOUND, OK
-
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import Http404
 
 from .base import BreadTestCase
@@ -22,7 +20,7 @@ class BreadDeleteTest(BreadTestCase):
         view = self.bread.get_delete_view()
         rsp = view(request, pk=self.item.pk)
         self.assertTrue(rsp.context_data['bread_test_class'])
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         self.assertTrue(self.model.objects.filter(pk=self.item.pk).exists())
 
         # Now post to confirm
@@ -30,7 +28,7 @@ class BreadDeleteTest(BreadTestCase):
         request.user = self.user
         view = self.bread.get_delete_view()
         rsp = view(request, pk=self.item.pk)
-        self.assertEqual(FOUND, rsp.status_code)
+        self.assertEqual(302, rsp.status_code)
         self.assertEqual(reverse(self.bread.get_url_name('browse')), rsp['Location'])
         self.assertFalse(self.model.objects.filter(pk=self.item.pk).exists())
 

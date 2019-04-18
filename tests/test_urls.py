@@ -38,23 +38,20 @@ class BreadURLsNamespaceTest(BreadTestCase):
         browse_pattern = [
             x for x in patterns
             if x.name == bread.browse_url_name(include_namespace=False)
-        ][0].regex.pattern
-        self.assertEqual('^%s/$' % self.bread.plural_name, browse_pattern)
+        ][0].pattern
+        self.assertEqual('%s/' % self.bread.plural_name, str(browse_pattern))
 
         read_pattern = [
             x for x in patterns
             if x.name == bread.read_url_name(include_namespace=False)
-        ][0].regex.pattern
-        self.assertTrue(read_pattern.startswith('^%s/' % self.bread.plural_name))
-        self.assertIn('(?P<pk>', read_pattern)
+        ][0].pattern
+        self.assertEqual('%s/<int:pk>/' % self.bread.plural_name, str(read_pattern))
 
         edit_pattern = [
             x for x in patterns
             if x.name == bread.edit_url_name(include_namespace=False)
-        ][0].regex.pattern
-        self.assertTrue(edit_pattern.startswith('^%s/' % self.bread.plural_name))
-        self.assertIn('(?P<pk>', edit_pattern)
-        self.assertTrue(edit_pattern.endswith('/edit/$'))
+        ][0].pattern
+        self.assertEqual('%s/<int:pk>/edit/' % self.bread.plural_name, str(edit_pattern))
 
 
 class BreadURLsTest(BreadTestCase):
@@ -73,17 +70,14 @@ class BreadURLsTest(BreadTestCase):
             set([x.name for x in patterns])
         )
 
-        browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][0].regex.pattern
-        self.assertEqual('^%s/$' % bread.plural_name, browse_pattern)
+        browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][0].pattern
+        self.assertEqual('%s/' % bread.plural_name, str(browse_pattern))
 
-        read_pattern = [x for x in patterns if x.name == bread.read_url_name()][0].regex.pattern
-        self.assertTrue(read_pattern.startswith('^%s/' % bread.plural_name))
-        self.assertIn('(?P<pk>', read_pattern)
+        read_pattern = [x for x in patterns if x.name == bread.read_url_name()][0].pattern
+        self.assertEqual('%s/<int:pk>/' % bread.plural_name, str(read_pattern))
 
-        edit_pattern = [x for x in patterns if x.name == bread.edit_url_name()][0].regex.pattern
-        self.assertTrue(edit_pattern.startswith('^%s/' % bread.plural_name))
-        self.assertIn('(?P<pk>', edit_pattern)
-        self.assertTrue(edit_pattern.endswith('/edit/$'))
+        edit_pattern = [x for x in patterns if x.name == bread.edit_url_name()][0].pattern
+        self.assertEqual('%s/<int:pk>/edit/' % bread.plural_name, str(edit_pattern))
 
     def test_view_subset(self):
         # We can do bread with a subset of the BREAD views
@@ -126,11 +120,11 @@ class BreadURLsTest(BreadTestCase):
             set([x.name for x in patterns])
         )
 
-        browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][0].regex.pattern
-        self.assertEqual('^$', browse_pattern)
+        browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][0].pattern
+        self.assertEqual('', str(browse_pattern))
 
-        read_pattern = [x for x in patterns if x.name == bread.read_url_name()][0].regex.pattern
-        self.assertEqual(r'^(?P<pk>\d+)/$', read_pattern)
+        read_pattern = [x for x in patterns if x.name == bread.read_url_name()][0].pattern
+        self.assertEqual('<int:pk>/', str(read_pattern))
 
-        edit_pattern = [x for x in patterns if x.name == bread.edit_url_name()][0].regex.pattern
-        self.assertEqual(r'^(?P<pk>\d+)/edit/$', edit_pattern)
+        edit_pattern = [x for x in patterns if x.name == bread.edit_url_name()][0].pattern
+        self.assertEqual('<int:pk>/edit/', str(edit_pattern))

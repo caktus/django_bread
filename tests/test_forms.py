@@ -1,8 +1,6 @@
-from six.moves.http_client import FOUND, BAD_REQUEST, OK
-
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .models import BreadTestModel
 from .base import BreadTestCase
@@ -39,7 +37,7 @@ class BreadFormAddTest(BreadTestCase):
         self.give_permission('add')
         view = self.bread.get_add_view()
         rsp = view(request)
-        self.assertEqual(FOUND, rsp.status_code)
+        self.assertEqual(302, rsp.status_code)
         self.assertEqual(reverse(self.bread.get_url_name('browse')), rsp['Location'])
         item = self.model.objects.get()
         self.assertEqual('Dan Jones', item.name)
@@ -52,7 +50,7 @@ class BreadFormAddTest(BreadTestCase):
         self.give_permission('add')
         view = self.bread.get_add_view()
         rsp = view(request)
-        self.assertEqual(BAD_REQUEST, rsp.status_code)
+        self.assertEqual(400, rsp.status_code)
         context = rsp.context_data
         form = context['form']
         errors = form.errors
@@ -66,7 +64,7 @@ class BreadFormAddTest(BreadTestCase):
         self.give_permission('add')
         view = self.bread.get_add_view()
         rsp = view(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         form = rsp.context_data['form']
         self.assertFalse(form.is_bound)
         rsp.render()
@@ -91,7 +89,7 @@ class BreadFormEditTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(FOUND, rsp.status_code)
+        self.assertEqual(302, rsp.status_code)
         self.assertEqual(reverse(self.bread.get_url_name('browse')), rsp['Location'])
         item = self.model.objects.get(pk=item.pk)
         self.assertEqual('Dan Jones', item.name)
@@ -104,7 +102,7 @@ class BreadFormEditTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(BAD_REQUEST, rsp.status_code)
+        self.assertEqual(400, rsp.status_code)
         context = rsp.context_data
         form = context['form']
         errors = form.errors
@@ -119,7 +117,7 @@ class BreadFormEditTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         form = rsp.context_data['form']
         self.assertFalse(form.is_bound)
         self.assertEqual(item.name, form.initial['name'])
@@ -147,7 +145,7 @@ class BreadExcludeTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         form = rsp.context_data['form']
         self.assertFalse(form.is_bound)
         self.assertNotIn('id', form.initial)

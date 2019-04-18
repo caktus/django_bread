@@ -1,17 +1,11 @@
 import json
-import six
-from six.moves.http_client import OK, METHOD_NOT_ALLOWED, BAD_REQUEST
+from unittest.mock import patch
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from bread.bread import BrowseView
 from .base import BreadTestCase
 from .factories import BreadTestModelFactory
-
-if six.PY3:
-    from unittest.mock import patch
-else:
-    from mock import patch
 
 
 class BreadBrowseTest(BreadTestCase):
@@ -24,7 +18,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         self.assertTrue(rsp.context_data['bread_test_class'])
         body = rsp.content.decode('utf-8')
@@ -41,7 +35,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
 
     def test_post(self):
         self.set_urls(self.bread)
@@ -50,7 +44,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.post(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(METHOD_NOT_ALLOWED, rsp.status_code)
+        self.assertEqual(405, rsp.status_code)
 
     @patch('bread.templatetags.bread_tags.logger')
     def test_sort_all_ascending(self, mock_logger):
@@ -65,7 +59,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         i = 0
@@ -94,7 +88,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
 
@@ -123,7 +117,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         i = 0
@@ -148,7 +142,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         i = 0
@@ -170,7 +164,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         self.assertEqual(a, results[0])
@@ -191,7 +185,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         self.assertEqual(a, results[0])
@@ -212,7 +206,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         self.assertEqual(a, results[0])
@@ -234,7 +228,7 @@ class BreadBrowseTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         results = rsp.context_data['object_list']
         self.assertEqual(a, results[0])
@@ -264,7 +258,7 @@ class BadSortTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(BAD_REQUEST, rsp.status_code)
+        self.assertEqual(400, rsp.status_code)
 
 
 class NotDisablingSortTest(BreadTestCase):
@@ -285,7 +279,7 @@ class NotDisablingSortTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         self.assertEqual([0], json.loads(rsp.context_data['valid_sorting_columns_json']))
 
@@ -306,6 +300,6 @@ class DisableSortTest(BreadTestCase):
         request = self.request_factory.get(url)
         request.user = self.user
         rsp = self.bread.get_browse_view()(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         rsp.render()
         self.assertEqual([], json.loads(rsp.context_data['valid_sorting_columns_json']))
