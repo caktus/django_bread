@@ -9,7 +9,6 @@ If Django ever gets this sorted out, we can move these models
 to the tests, and maybe get fancier with different test models
 for different tests.
 """
-from __future__ import unicode_literals
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
