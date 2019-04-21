@@ -3,13 +3,11 @@
 Installation
 ============
 
-Django Bread is not yet in PyPI (TODO), but it's pretty
-easy to install the version you want using pip from github.
-Add something like this to your requirements.txt::
+Django Bread is on `PyPI <https://pypi.org/>`_. To install, add this to your requirements.txt::
 
-    git+git://github.com/caktus/django_bread@0.0.6#egg=django_bread
+    django-bread==0.6.0
 
-Just change ``0.0.6`` in that example to the version that you
+Just change ``0.6.0`` in that example to the version that you
 want to install.  Or leave it out to get the latest release.
 
 Then run::
@@ -27,4 +25,3 @@ Django
 
       <script src="{% static 'js/URI.js' %}"></script>
       <script src="{% static 'js/bread.js' %}"></script>
-

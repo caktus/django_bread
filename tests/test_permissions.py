@@ -1,10 +1,8 @@
-from six.moves.http_client import FOUND
-
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import override_settings
 
 from .base import BreadTestCase
@@ -48,7 +46,7 @@ class BreadPermissionTestMixin(object):
         if self.include_post:
             self.post_request.user = AnonymousUser()
             rsp = self.view(self.post_request, pk=self.item.pk)
-            self.assertEqual(FOUND, rsp.status_code)
+            self.assertEqual(302, rsp.status_code)
             self.assertEqual(expected_url, rsp['Location'])
 
     def test_access_without_permission(self):

@@ -1,13 +1,9 @@
 from functools import reduce
 import json
 from operator import or_
-
-from six import string_types as six_string_types
-from six.moves.http_client import BAD_REQUEST
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib.admin.utils import lookup_needs_distinct
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
@@ -18,19 +14,10 @@ from django.db.models import Model, Q
 from django.db.models.sql import EmptyResultSet
 from django.forms.models import modelform_factory
 from django.http.response import HttpResponseBadRequest
+from django.urls import reverse_lazy, path
 from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from .utils import validate_fieldspec, get_verbose_name, user_is_authenticated
-
-
-from django import VERSION as django_version
-if django_version >= (1, 10):
-    # Modern Django
-    from django.urls import reverse_lazy
-else:
-    # deprecated in 1.10
-    # django.core.urlresolvers to be removed in Django 2.0
-    from django.core.urlresolvers import reverse_lazy
+from .utils import validate_fieldspec, get_verbose_name
 
 
 class Http400(Exception):
@@ -104,7 +91,7 @@ class BreadViewMixin(object):
                 "'permission_required' attribute to be set.")
 
         # Check if the user is logged in
-        if not user_is_authenticated(request.user):
+        if not request.user.is_authenticated:
             return redirect_to_login(request.get_full_path(),
                                      settings.LOGIN_URL,
                                      REDIRECT_FIELD_NAME)
@@ -417,7 +404,7 @@ class LabelValueReadView(ReadView):
         Implements the modes described in the class docstring. (q.v.)
         """
         value = ''
-        if isinstance(evaluator, six_string_types):
+        if isinstance(evaluator, str):
             if hasattr(self.object, evaluator):
                 # This is an instance attr or method
                 attr = getattr(self.object, evaluator)
@@ -446,7 +433,7 @@ class EditView(BreadViewMixin, UpdateView):
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
         rsp = super(EditView, self).form_invalid(form)
-        rsp.status_code = BAD_REQUEST
+        rsp.status_code = 400
         return rsp
 
 
@@ -457,7 +444,7 @@ class AddView(BreadViewMixin, CreateView):
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
         rsp = super(AddView, self).form_invalid(form)
-        rsp.status_code = BAD_REQUEST
+        rsp.status_code = 400
         return rsp
 
 
@@ -673,31 +660,31 @@ class Bread(object):
         urlpatterns = []
         if 'B' in self.views:
             urlpatterns.append(
-                url(r'^%s$' % prefix,
-                    self.get_browse_view(),
-                    name=self.browse_url_name(include_namespace=False)))
+                path('%s' % prefix,
+                     self.get_browse_view(),
+                     name=self.browse_url_name(include_namespace=False)))
 
         if 'R' in self.views:
             urlpatterns.append(
-                url(r'^%s(?P<pk>\d+)/$' % prefix,
-                    self.get_read_view(),
-                    name=self.read_url_name(include_namespace=False)))
+                path('%s<int:pk>/' % prefix,
+                     self.get_read_view(),
+                     name=self.read_url_name(include_namespace=False)))
 
         if 'E' in self.views:
             urlpatterns.append(
-                url(r'^%s(?P<pk>\d+)/edit/$' % prefix,
-                    self.get_edit_view(),
-                    name=self.edit_url_name(include_namespace=False)))
+                path('%s<int:pk>/edit/' % prefix,
+                     self.get_edit_view(),
+                     name=self.edit_url_name(include_namespace=False)))
 
         if 'A' in self.views:
             urlpatterns.append(
-                url(r'^%sadd/$' % prefix,
-                    self.get_add_view(),
-                    name=self.add_url_name(include_namespace=False)))
+                path('%sadd/' % prefix,
+                     self.get_add_view(),
+                     name=self.add_url_name(include_namespace=False)))
 
         if 'D' in self.views:
             urlpatterns.append(
-                url(r'^%s(?P<pk>\d+)/delete/$' % prefix,
-                    self.get_delete_view(),
-                    name=self.delete_url_name(include_namespace=False)))
+                path('%s<int:pk>/delete/' % prefix,
+                     self.get_delete_view(),
+                     name=self.delete_url_name(include_namespace=False)))
         return urlpatterns

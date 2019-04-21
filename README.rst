@@ -7,14 +7,17 @@ Add, Delete) views for Django models.
 It helps with default templates, url generation, permissions, filters,
 pagination, and more.
 
-This is still very Alpha. We're starting to use it, but the documentation
-is very sketchy and the design is still evolving.
+This is relatively stable. We're using it in production and have attempted
+to document the important parts, but feedback is welcome.
 
 Supported versions
 ------------------
 
-Django: 1.8, 1.10, 1.11
-Python: 2.7, 3.5, 3.6
+Django: 2.0, 2.1, 2.2
+Python: 3.5, 3.6, 3.7
+
+For Python 2.7 and/or Django 1.11 support, the 0.5 release series is identical (features-wise)
+to 0.6 and is available on PyPI: https://pypi.org/project/django-bread/#history
 
 Testing
 -------

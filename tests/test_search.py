@@ -1,6 +1,4 @@
 # coding: utf-8
-from six.moves.http_client import OK
-
 from tests.base import BreadTestCase
 from tests.factories import BreadTestModelFactory
 from bread.bread import BrowseView, Bread
@@ -43,7 +41,7 @@ class BreadSearchTestCase(BreadTestCase):
         request = self.request_factory.get('', data=data)
         request.user = self.user
         rsp = self.view(request)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         return rsp.context_data['object_list']
 
     def test_no_query_parm(self):

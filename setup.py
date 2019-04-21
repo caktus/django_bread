@@ -12,9 +12,8 @@ setup(
     description='Helper for building BREAD interfaces',
     include_package_data=True,
     install_requires=[
-        'django-filter>=0.9.2,<1.0',
+        'django-filter>2,<2.2.0',
         'django-vanilla-views>=1.0.3,<2.0',
-        'six'
     ],
     long_description=open('README.rst').read(),
     classifiers=[
@@ -22,14 +21,14 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Framework :: Django :: 1.8',
-        'Framework :: Django :: 1.10',
-        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
+        'Framework :: Django :: 2.1',
+        'Framework :: Django :: 2.2',
     ],
     zip_safe=False,  # because we're including media that Django needs
 )

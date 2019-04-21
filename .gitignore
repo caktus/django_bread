@@ -1,5 +1,6 @@
-*.pyc
+__pycache__/
 build
 dist
 .tox
 _build
+*.egg-info/

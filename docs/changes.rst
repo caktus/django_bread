@@ -3,6 +3,14 @@
 Change Log
 ==========
 
+0.6.0 - Apr 19, 2019
+--------------------
+
+* Add support for Python 3.7
+* Add support for Django 2.0, 2.1 and 2.2
+* Drop support for Python < 3
+* Drop support for Django <= 1.11
+
 0.5.1 - Dec 1, 2017
 -------------------
 

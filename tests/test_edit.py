@@ -1,6 +1,4 @@
-from six.moves.http_client import FOUND, BAD_REQUEST, OK
-
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django import forms
 
 from bread.bread import EditView, Bread
@@ -21,7 +19,7 @@ class BreadEditTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(FOUND, rsp.status_code)
+        self.assertEqual(302, rsp.status_code)
         self.assertEqual(reverse(self.bread.get_url_name('browse')), rsp['Location'])
         item = self.model.objects.get(pk=item.pk)
         self.assertEqual('Fred Jones', item.name)
@@ -35,7 +33,7 @@ class BreadEditTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(BAD_REQUEST, rsp.status_code)
+        self.assertEqual(400, rsp.status_code)
         self.assertTrue(rsp.context_data['bread_test_class'])
         context = rsp.context_data
         form = context['form']
@@ -51,7 +49,7 @@ class BreadEditTest(BreadTestCase):
         self.give_permission('change')
         view = self.bread.get_edit_view()
         rsp = view(request, pk=item.pk)
-        self.assertEqual(OK, rsp.status_code)
+        self.assertEqual(200, rsp.status_code)
         form = rsp.context_data['form']
         self.assertFalse(form.is_bound)
         self.assertEqual(item.pk, form.initial['id'])
