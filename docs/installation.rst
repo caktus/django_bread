@@ -5,9 +5,9 @@ Installation
 
 Django Bread is on `PyPI <https://pypi.org/>`_. To install, add this to your requirements.txt::
 
-    django-bread==0.5.1
+    django-bread==0.6.0
 
-Just change ``0.5.1`` in that example to the version that you
+Just change ``0.6.0`` in that example to the version that you
 want to install.  Or leave it out to get the latest release.
 
 Then run::
