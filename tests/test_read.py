@@ -12,7 +12,7 @@ class BreadReadTest(BreadTestCase):
     def setUp(self):
         super(BreadReadTest, self).setUp()
         self.urlconf = 'bread.tests.test_read'
-        self.give_permission('read')
+        self.give_permission('view')
         self.set_urls(self.bread)
 
     def test_read(self):
@@ -42,7 +42,7 @@ class BreadReadTest(BreadTestCase):
 
     def test_post(self):
         self.set_urls(self.bread)
-        self.give_permission('read')
+        self.give_permission('view')
         item = self.model_factory()
         url = reverse(self.bread.get_url_name('read'), kwargs={'pk': item.pk})
         request = self.request_factory.post(url)
@@ -81,7 +81,7 @@ class BreadLabelValueReadTest(BreadTestCase):
         self.model_factory = BreadLabelValueTestModelFactory
 
         self.urlconf = 'bread.tests.test_read'
-        self.give_permission('read')
+        self.give_permission('view')
         self.set_urls(self.bread)
 
     def test_read(self):

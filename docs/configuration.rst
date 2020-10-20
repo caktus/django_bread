@@ -117,11 +117,15 @@ These can be set on any individual view class.
 
 perm_name
     The base permission name needed to access the view. Defaults are
-    'browse', 'read', 'edit', 'add', and 'delete'.  Then `_` and the
+    'browse', 'view', 'edit', 'add', and 'delete'.  Then `_` and the
     lowercased model name are appended to get the complete permission name
     that a user must have to access the view. E.g. if your model is
     `MyModel` and you leave the default `perm_name` on the browse view,
     the user must have `browse_mymodel` permission.
+
+    (Note that the permission for the "read" view is "view", not "read".
+    It's a little confusing in this context, but "view" is what Django
+    decided on for its standard read-only permission.)
 
 template_name_suffix
     The default string that the template this view uses will end with.
@@ -289,7 +293,7 @@ Alternate read view configuration
 ---------------------------------
 
 The default read view uses a form to describe which fields to display. If
-you would rather have more flexibilty, subclass `bread.LabelValueReadView`
+you would rather have more flexibility, subclass `bread.LabelValueReadView`
 and set these parameters.
 
 LabelValueReadView is a subclass of ReadView.

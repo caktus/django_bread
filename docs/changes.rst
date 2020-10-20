@@ -3,6 +3,19 @@
 Change Log
 ==========
 
+0.7.0 - Oct 20, 2020
+-------------------
+
+* BREAKING CHANGE: by default, read views now need Django's
+  "view_<modelname>" permission instead of the nonstandard
+  "read_<modelname>".
+* Drop support for Django 2.0
+
+Supported versions in this release are:
+
+Django: 2.1, 2.2
+Python: 3.5, 3.6, 3.7
+
 0.6.0 - Apr 19, 2019
 --------------------
 
