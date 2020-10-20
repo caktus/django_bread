@@ -10,13 +10,13 @@ pagination, and more.
 This is relatively stable. We're using it in production and have attempted
 to document the important parts, but feedback is welcome.
 
-Breaking change in 0.7.0
+Breaking change in 1.0.0
 ------------------------
 
-Version 0.7.0 includes a breaking change! If you're using the default
+Version 1.0.0 includes a breaking change! If you're using the default
 view permissions, before upgrading, make sure you've
 migrated your users and groups that have "read_{model_name}"
-permissions to also have "view_{model_name}".  From 0.7.0 on, that's the
+permissions to also have "view_{model_name}".  From 1.0.0 on, that's the
 default permission a user needs to use the read views, because it's become the
 standard Django permission for read-only access since Django 2.1.
 

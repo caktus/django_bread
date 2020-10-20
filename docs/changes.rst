@@ -3,7 +3,7 @@
 Change Log
 ==========
 
-0.7.0 - Oct 20, 2020
+1.0.0 - Oct 20, 2020
 -------------------
 
 * BREAKING CHANGE: by default, read views now need Django's
