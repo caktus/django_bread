@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ['name'],
-                'permissions': [('read_breadtestmodel', 'can read BreadTestModel'), ('browse_breadtestmodel', 'can browse BreadTestModel')],
+                'permissions': [('browse_breadtestmodel', 'can browse BreadTestModel')],
             },
             bases=(models.Model,),
         ),

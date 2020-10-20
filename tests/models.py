@@ -52,7 +52,6 @@ class BreadTestModel(models.Model):
             '-age',  # If same name, sort oldest first
         ]
         permissions = [
-            ('read_breadtestmodel', 'can read BreadTestModel'),
             ('browse_breadtestmodel', 'can browse BreadTestModel'),
         ]
 

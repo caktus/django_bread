@@ -10,10 +10,25 @@ pagination, and more.
 This is relatively stable. We're using it in production and have attempted
 to document the important parts, but feedback is welcome.
 
+Breaking change in 1.0.0
+------------------------
+
+Version 1.0.0 includes a breaking change! If you're using the default
+view permissions, before upgrading, make sure you've
+migrated your users and groups that have "read_{model_name}"
+permissions to also have "view_{model_name}".  From 1.0.0 on, that's the
+default permission a user needs to use the read views, because it's become the
+standard Django permission for read-only access since Django 2.1.
+
+If you're still on Django 2.0, don't upgrade django-bread until you
+can get to at least Django 2.1. (Hopefully that's not the case, since
+Django 2.0 has been out of support since April 1, 2019.)
+
+
 Supported versions
 ------------------
 
-Django: 2.0, 2.1, 2.2
+Django: 2.1, 2.2
 Python: 3.5, 3.6, 3.7
 
 For Python 2.7 and/or Django 1.11 support, the 0.5 release series is identical (features-wise)

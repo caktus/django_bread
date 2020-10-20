@@ -345,7 +345,7 @@ class ReadView(BreadViewMixin, DetailView):
     we can iterate over in the template to display it if we don't want
     to make a custom template for this model.
     """
-    perm_name = 'read'  # Not a default Django permission
+    perm_name = 'view'  # Default Django permission
     template_name_suffix = '_read'
 
     def get_context_data(self, **kwargs):
