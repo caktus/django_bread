@@ -30,9 +30,8 @@ work.
 """
 import inspect
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldDoesNotExist
 from django.db.models import Model
-from django.db.models.fields import FieldDoesNotExist
 from django.db.models.fields.related import RelatedField
 
 

@@ -9,9 +9,10 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied, FieldError
+from django.core.exceptions import (
+    ImproperlyConfigured, PermissionDenied, FieldError, EmptyResultSet
+)
 from django.db.models import Model, Q
-from django.db.models.sql import EmptyResultSet
 from django.forms.models import modelform_factory
 from django.http.response import HttpResponseBadRequest
 from django.urls import reverse_lazy, path
