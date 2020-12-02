@@ -10,7 +10,6 @@ to the tests, and maybe get fancier with different test models
 for different tests.
 """
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class BreadLabelValueTestModel(models.Model):
@@ -37,7 +36,6 @@ class BreadTestModel2(models.Model):
         return self.text
 
 
-@python_2_unicode_compatible
 class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
     age = models.IntegerField()

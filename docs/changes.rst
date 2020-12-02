@@ -3,8 +3,22 @@
 Change Log
 ==========
 
-1.0.0 - Oct 20, 2020
+1.0.1 - Dec 2, 2020
 -------------------
+
+* Drop specific version dependencies in setup.py for
+  django-filter and django-vanilla-views
+* Update supported versions of Python and Django,
+  dropping Django 2.1 and adding 3.0 and 3.1,
+  and dropping Python 3.5 and 3.6 and adding 3.8 and 3.9.
+
+Supported versions in this release are:
+
+Django: 2.2, 3.0, 3.1
+Python: 3.7, 3.8, 3.9
+
+1.0.0 - Oct 20, 2020
+--------------------
 
 * BREAKING CHANGE: by default, read views now need Django's
   "view_<modelname>" permission instead of the nonstandard

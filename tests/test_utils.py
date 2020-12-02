@@ -1,5 +1,4 @@
-from django.core.exceptions import ValidationError
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import ValidationError, FieldDoesNotExist
 from django.test import TestCase
 
 from bread.utils import get_model_field, validate_fieldspec, has_required_args, get_verbose_name
