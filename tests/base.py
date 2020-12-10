@@ -1,26 +1,30 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase, RequestFactory, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 
-from bread.bread import Bread, ReadView, BrowseView
+from bread.bread import Bread, BrowseView, ReadView
 
-from .models import BreadTestModel
 from .factories import BreadTestModelFactory
+from .models import BreadTestModel
 
 # Set urlpatterns for a test by calling .set_urls()
 urlpatterns = None
 
 
-@override_settings(ROOT_URLCONF='tests.base',
-                   BREAD={'DEFAULT_BASE_TEMPLATE': 'bread/empty.html', })
+@override_settings(
+    ROOT_URLCONF="tests.base",
+    BREAD={
+        "DEFAULT_BASE_TEMPLATE": "bread/empty.html",
+    },
+)
 class BreadTestCase(TestCase):
-    url_namespace = ''
+    url_namespace = ""
     extra_bread_attributes = {}
 
     def setUp(self):
-        self.username = 'joe'
-        self.password = 'random'
+        self.username = "joe"
+        self.password = "random"
         User = get_user_model()
         self.user = User.objects.create_user(username=self.username)
         self.user.set_password(self.password)
@@ -33,28 +37,34 @@ class BreadTestCase(TestCase):
 
         class ReadClass(ReadView):
             columns = [
-                ('Name', 'name'),
-                ('Text', 'other__text'),
-                ('Model1', 'model1',)
-                ]
+                ("Name", "name"),
+                ("Text", "other__text"),
+                (
+                    "Model1",
+                    "model1",
+                ),
+            ]
 
         class BrowseClass(BrowseView):
             columns = [
-                ('Name', 'name'),
-                ('Text', 'other__text'),
-                ('Model1', 'model1',)
+                ("Name", "name"),
+                ("Text", "other__text"),
+                (
+                    "Model1",
+                    "model1",
+                ),
             ]
 
         class BreadTestClass(Bread):
             model = self.model
-            base_template = 'bread/empty.html'
+            base_template = "bread/empty.html"
             browse_view = BrowseClass
             namespace = self.url_namespace
-            plural_name = 'testmodels'
+            plural_name = "testmodels"
 
             def get_additional_context_data(self):
                 context = super(BreadTestClass, self).get_additional_context_data()
-                context['bread_test_class'] = True
+                context["bread_test_class"] = True
                 return context
 
         for k, v in self.extra_bread_attributes.items():
@@ -78,7 +88,7 @@ class BreadTestCase(TestCase):
         """
         return Permission.objects.get_or_create(
             content_type=ContentType.objects.get_for_model(self.model),
-            codename='%s_%s' % (short_name, self.model_name)
+            codename="%s_%s" % (short_name, self.model_name),
         )[0]
 
     def give_permission(self, short_name):

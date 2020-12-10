@@ -5,12 +5,11 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from bread.utils import get_model_field
 
-
 logger = logging.getLogger(__name__)
 register = template.Library()
 
 
-@register.filter(name='getter')
+@register.filter(name="getter")
 def getter(value, arg):
     """
     Given an object `value`, return the value of the attribute named `arg`.
