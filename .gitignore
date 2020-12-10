@@ -4,3 +4,5 @@ dist
 .tox
 _build
 *.egg-info/
+.coverage
+.python-version

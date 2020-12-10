@@ -34,10 +34,34 @@ Python: 3.7, 3.8, 3.9
 For Python 2.7 and/or Django 1.11 support, the 0.5 release series is identical (features-wise)
 to 0.6 and is available on PyPI: https://pypi.org/project/django-bread/#history
 
-Testing
--------
 
-To run the tests, install "tox" ("pip install tox") and just run it:
+Maintainer Information
+----------------------
 
-    $ tox
-    ...
+We use Github Actions to lint (using pre-commit, black, isort, and flake8),
+test (using tox and tox-gh-actions), calculate coverage (using coverage), and build
+documentation (using sphinx).
+
+We have a local script to do these actions locally, named ``maintain.sh``::
+
+  $ ./maintain.sh
+
+A Github Action workflow also builds and pushes a new package to PyPI whenever a new
+Release is created in Github. This uses a project-specific PyPI token, as described in
+the `PyPI documentation here <https://pypi.org/help/#apitoken>`_. That token has been
+saved in the ``PYPI_PASSWORD`` settings for this repo, but has not been saved anywhere
+else so if it is needed for any reason, the current one should be deleted and a new one
+generated.
+
+As always, be sure to bump the version in ``bread/__init__.py`` before creating a
+Release, so that the proper version gets pushed to PyPI.
+
+
+Questions or Issues?
+--------------------
+
+If you have questions, issues or requests for improvements please let us know on
+`Github <https://github.com/caktus/django_bread/issues>`_.
+
+Development sponsored by `Caktus Consulting Group, LLC
+<https://www.caktusgroup.com/services>`_.
