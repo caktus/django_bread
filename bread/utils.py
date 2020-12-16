@@ -30,7 +30,7 @@ work.
 """
 import inspect
 
-from django.core.exceptions import ValidationError, FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db.models import Model
 from django.db.models.fields.related import RelatedField
 
@@ -46,14 +46,16 @@ def get_model_field(model_instance, spec):
     if model_instance is None:
         raise ValueError("None passed into get_model_field")
     if not isinstance(model_instance, Model):
-        raise ValueError("%r should be an instance of a model but it is a %s"
-                         % (model_instance, type(model_instance)))
+        raise ValueError(
+            "%r should be an instance of a model but it is a %s"
+            % (model_instance, type(model_instance))
+        )
 
-    if (spec.startswith('__') and spec.endswith('__')):
+    if spec.startswith("__") and spec.endswith("__"):
         # It's a dunder method; don't split it.
         name_parts = [spec]
     else:
-        name_parts = spec.split('__', 1)
+        name_parts = spec.split("__", 1)
 
     value = getattr(model_instance, name_parts[0])
     if callable(value):
@@ -96,7 +98,7 @@ def has_required_args(func):
     spec = inspect.getfullargspec(func)
     num_args = len(spec.args)
     # If first arg is 'self', we can ignore one arg
-    if num_args and spec.args[0] == 'self':
+    if num_args and spec.args[0] == "self":
         num_args -= 1
     # If there are defaults, we can ignore the same number of args
     if spec.defaults:
@@ -116,9 +118,11 @@ def validate_fieldspec(model, spec):
     Otherwise just returns.
     """
     if not issubclass(model, Model):
-        raise TypeError("First argument to validate_fieldspec must be a "
-                        "subclass of Model; it is %r" % model)
-    parts = spec.split('__', 1)
+        raise TypeError(
+            "First argument to validate_fieldspec must be a "
+            "subclass of Model; it is %r" % model
+        )
+    parts = spec.split("__", 1)
     rest_of_spec = parts[1] if len(parts) > 1 else None
 
     # What are the possibilities for what parts[0] is on our model?
@@ -136,7 +140,8 @@ def validate_fieldspec(model, spec):
         # Not a field - is there an attribute of some sort?
         if not hasattr(model, parts[0]):
             raise ValidationError(
-                "There is no field or attribute named '%s' on model '%s'" % (parts[0], model)
+                "There is no field or attribute named '%s' on model '%s'"
+                % (parts[0], model)
             )
         if rest_of_spec:
             raise ValidationError(

@@ -1,5 +1,5 @@
-from functools import reduce
 import json
+from functools import reduce
 from operator import or_
 from urllib.parse import urlencode
 
@@ -10,15 +10,18 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import (
-    ImproperlyConfigured, PermissionDenied, FieldError, EmptyResultSet
+    EmptyResultSet,
+    FieldError,
+    ImproperlyConfigured,
+    PermissionDenied,
 )
 from django.db.models import Model, Q
 from django.forms.models import modelform_factory
 from django.http.response import HttpResponseBadRequest
-from django.urls import reverse_lazy, path
-from vanilla import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import path, reverse_lazy
+from vanilla import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from .utils import validate_fieldspec, get_verbose_name
+from .utils import get_verbose_name, validate_fieldspec
 
 
 class Http400(Exception):
@@ -38,12 +41,13 @@ DEFAULT_BASE_TEMPLATE: Default value for Bread's base_template argument
 
 # Helper to get settings from BREAD dictionary, or default
 def setting(name, default=None):
-    BREAD = getattr(settings, 'BREAD', {})
+    BREAD = getattr(settings, "BREAD", {})
     return BREAD.get(name, default)
 
 
 class BreadViewMixin(object):
     """We mix this into all the views for some common features"""
+
     bread = None  # The Bread object using this view
 
     exclude = None
@@ -66,10 +70,13 @@ class BreadViewMixin(object):
     def __init__(self, *args, **kwargs):
         # Make sure the permission needed to use this view exists.
         super(BreadViewMixin, self).__init__(*args, **kwargs)
-        perm_name = '%s_%s' % (self.perm_name, self.bread.model._meta.object_name.lower())
+        perm_name = "%s_%s" % (
+            self.perm_name,
+            self.bread.model._meta.object_name.lower(),
+        )
         perm = Permission.objects.filter(
             content_type=ContentType.objects.get_for_model(self.bread.model),
-            codename=perm_name
+            codename=perm_name,
         ).first()
         if not perm:
             raise ImproperlyConfigured(
@@ -86,16 +93,17 @@ class BreadViewMixin(object):
     def dispatch(self, request, *args, **kwargs):
         # Make sure that the permission_required attribute is set on the
         # view, or raise a configuration error.
-        if self.permission_required is None:   # pragma: no cover
+        if self.permission_required is None:  # pragma: no cover
             raise ImproperlyConfigured(
                 "'BreadViewMixin' requires "
-                "'permission_required' attribute to be set.")
+                "'permission_required' attribute to be set."
+            )
 
         # Check if the user is logged in
         if not request.user.is_authenticated:
-            return redirect_to_login(request.get_full_path(),
-                                     settings.LOGIN_URL,
-                                     REDIRECT_FIELD_NAME)
+            return redirect_to_login(
+                request.get_full_path(), settings.LOGIN_URL, REDIRECT_FIELD_NAME
+            )
 
         # Check to see if the request's user has the required permission.
         has_permission = request.user.has_perm(self.permission_required)
@@ -106,25 +114,25 @@ class BreadViewMixin(object):
         try:
             return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
         except Http400 as e:
-            return HttpResponseBadRequest(content=e.msg.encode('utf-8'))
+            return HttpResponseBadRequest(content=e.msg.encode("utf-8"))
 
     def get_template_names(self):
         """Return Django Vanilla templates (app-specific), then
-                  Customized template via Bread object, then
-                  Django Bread template
+        Customized template via Bread object, then
+        Django Bread template
         """
         vanilla_templates = super(BreadViewMixin, self).get_template_names()
 
         # template_name_suffix may have a leading underscore (to make it work well with Django
         # Vanilla Views). If it does, then we strip the underscore to get our 'view' name.
         # e.g. template_name_suffix '_browse' -> view 'browse'
-        view = self.template_name_suffix.lstrip('_')
-        default_template = 'bread/%s.html' % view
+        view = self.template_name_suffix.lstrip("_")
+        default_template = "bread/%s.html" % view
         if self.bread.template_name_pattern:
             custom_template = self.bread.template_name_pattern.format(
                 app_label=self.bread.model._meta.app_label,
                 model=self.bread.model._meta.object_name.lower(),
-                view=view
+                view=view,
             )
             return vanilla_templates + [custom_template] + [default_template]
         return vanilla_templates + [default_template]
@@ -144,16 +152,21 @@ class BreadViewMixin(object):
 
         # Add 'may_<viewname>' to the context for each view, so the templates can
         # tell if the current user may use the named view.
-        data['may_browse'] = 'B' in self.bread.views \
-                             and self.request.user.has_perm(self.get_full_perm_name('browse'))
-        data['may_read'] = 'R' in self.bread.views \
-                           and self.request.user.has_perm(self.get_full_perm_name('read'))
-        data['may_edit'] = 'E' in self.bread.views \
-                           and self.request.user.has_perm(self.get_full_perm_name('change'))
-        data['may_add'] = 'A' in self.bread.views \
-                          and self.request.user.has_perm(self.get_full_perm_name('add'))
-        data['may_delete'] = 'D' in self.bread.views \
-                             and self.request.user.has_perm(self.get_full_perm_name('delete'))
+        data["may_browse"] = "B" in self.bread.views and self.request.user.has_perm(
+            self.get_full_perm_name("browse")
+        )
+        data["may_read"] = "R" in self.bread.views and self.request.user.has_perm(
+            self.get_full_perm_name("read")
+        )
+        data["may_edit"] = "E" in self.bread.views and self.request.user.has_perm(
+            self.get_full_perm_name("change")
+        )
+        data["may_add"] = "A" in self.bread.views and self.request.user.has_perm(
+            self.get_full_perm_name("add")
+        )
+        data["may_delete"] = "D" in self.bread.views and self.request.user.has_perm(
+            self.get_full_perm_name("delete")
+        )
         return data
 
     def get_form(self, data=None, files=None, **kwargs):
@@ -161,8 +174,8 @@ class BreadViewMixin(object):
         if not form_class:
             form_class = modelform_factory(
                 self.bread.model,
-                fields='__all__',
-                exclude=self.exclude or self.bread.exclude
+                fields="__all__",
+                exclude=self.exclude or self.bread.exclude,
             )
         return form_class(data=data, files=files, **kwargs)
 
@@ -178,10 +191,10 @@ class BrowseView(BreadViewMixin, ListView):
     columns = []
     filterset = None  # Class
     paginate_by = None
-    perm_name = 'browse'  # Not a default Django permission
+    perm_name = "browse"  # Not a default Django permission
     search_fields = []
     search_terms = None
-    template_name_suffix = '_browse'
+    template_name_suffix = "_browse"
 
     _valid_sorting_columns = []  # indices of columns that are valid in ordering parms
 
@@ -224,39 +237,45 @@ class BrowseView(BreadViewMixin, ListView):
 
         # Now search
         # QueryDict.pop() always returns a list
-        q = query_parms.pop('q', [False])[0]
+        q = query_parms.pop("q", [False])[0]
         if self.search_fields and q:
             qset, use_distinct = self.get_search_results(self.request, qset, q)
             if use_distinct:
                 qset = qset.distinct()
 
         # Sort?
-        o = query_parms.pop('o', [False])[0]
+        o = query_parms.pop("o", [False])[0]
         if o:
             order_by = []
-            for o_field in o.split(','):
-                prefix = ''
-                if o_field.startswith('-'):
-                    prefix = '-'
+            for o_field in o.split(","):
+                prefix = ""
+                if o_field.startswith("-"):
+                    prefix = "-"
                     o_field = o_field[1:]
                 try:
                     column_number = int(o_field)
                 except ValueError:
-                    raise Http400("%s is not a valid integer in sorting param o=%r" %
-                                  (o_field, o))
+                    raise Http400(
+                        "%s is not a valid integer in sorting param o=%r" % (o_field, o)
+                    )
                 if column_number not in self._valid_sorting_columns:
                     raise Http400(
                         "%d is not a valid column number to sort on. "
                         "The valid column numbers are %r"
-                        % (column_number, self._valid_sorting_columns))
-                order_by.append('%s%s' %
-                                (prefix, self.get_sort_field_name_for_column(column_number)))
+                        % (column_number, self._valid_sorting_columns)
+                    )
+                order_by.append(
+                    "%s%s"
+                    % (prefix, self.get_sort_field_name_for_column(column_number))
+                )
             # Add any ordering from the model's Meta data that isn't already included.
             # That will make the rest of the sort stable, if the model has some default sort order.
-            default_ordering = getattr(self, 'default_ordering', qset.model._meta.ordering)
-            order_by_without_leading_dashes = [x.lstrip('-') for x in order_by]
+            default_ordering = getattr(
+                self, "default_ordering", qset.model._meta.ordering
+            )
+            order_by_without_leading_dashes = [x.lstrip("-") for x in order_by]
             for order_spec in default_ordering:
-                if order_spec.lstrip('-') not in order_by_without_leading_dashes:
+                if order_spec.lstrip("-") not in order_by_without_leading_dashes:
                     order_by.append(order_spec)
             qset = qset.order_by(*order_by)
             # Validate those parms
@@ -264,7 +283,8 @@ class BrowseView(BreadViewMixin, ListView):
                 str(qset.query)  # unused, just evaluate it to make it compile the query
             except FieldError as e:
                 raise Http400(
-                    "There is an invalid column for sorting in the ordering parameter: %s" % str(e)
+                    "There is an invalid column for sorting in the ordering parameter: %s"
+                    % str(e)
                 )
             except EmptyResultSet:
                 # It can throw this but we don't care
@@ -279,28 +299,30 @@ class BrowseView(BreadViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         data = super(BrowseView, self).get_context_data(**kwargs)
-        data['o'] = self.request.GET.get('o', '')
-        data['q'] = self.request.GET.get('q', '')
-        data['columns'] = self.columns
-        data['valid_sorting_columns_json'] = json.dumps(self._valid_sorting_columns)
-        data['has_filter'] = self.filterset is not None
-        data['has_search'] = bool(self.search_fields)
+        data["o"] = self.request.GET.get("o", "")
+        data["q"] = self.request.GET.get("q", "")
+        data["columns"] = self.columns
+        data["valid_sorting_columns_json"] = json.dumps(self._valid_sorting_columns)
+        data["has_filter"] = self.filterset is not None
+        data["has_search"] = bool(self.search_fields)
         if self.search_fields and self.search_terms:
-            data['search_terms'] = self.search_terms
+            data["search_terms"] = self.search_terms
         else:
-            data['search_terms'] = ''
-        data['filter'] = self.filter
-        if data.get('is_paginated', False):
-            page = data['page_obj']
-            num_pages = data['paginator'].num_pages
+            data["search_terms"] = ""
+        data["filter"] = self.filter
+        if data.get("is_paginated", False):
+            page = data["page_obj"]
+            num_pages = data["paginator"].num_pages
             if page.has_next():
                 if page.next_page_number() != num_pages:
-                    data['next_url'] = self._get_new_url(page=page.next_page_number())
-                data['last_url'] = self._get_new_url(page=num_pages)
+                    data["next_url"] = self._get_new_url(page=page.next_page_number())
+                data["last_url"] = self._get_new_url(page=num_pages)
             if page.has_previous():
-                data['first_url'] = self._get_new_url(page=1)
+                data["first_url"] = self._get_new_url(page=1)
                 if page.previous_page_number() != 1:
-                    data['previous_url'] = self._get_new_url(page=page.previous_page_number())
+                    data["previous_url"] = self._get_new_url(
+                        page=page.previous_page_number()
+                    )
         return data
 
     # The following is copied from the Django admin and tweaked
@@ -311,11 +333,11 @@ class BrowseView(BreadViewMixin, ListView):
         """
         # Apply keyword searches.
         def construct_search(field_name):
-            if field_name.startswith('^'):
+            if field_name.startswith("^"):
                 return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
+            elif field_name.startswith("="):
                 return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
+            elif field_name.startswith("@"):
                 return "%s__search" % field_name[1:]
             else:
                 return "%s__icontains" % field_name
@@ -323,11 +345,11 @@ class BrowseView(BreadViewMixin, ListView):
         use_distinct = False
         search_fields = self.search_fields
         if search_fields and search_term:
-            orm_lookups = [construct_search(str(search_field))
-                           for search_field in search_fields]
+            orm_lookups = [
+                construct_search(str(search_field)) for search_field in search_fields
+            ]
             for bit in search_term.split():
-                or_queries = [Q(**{orm_lookup: bit})
-                              for orm_lookup in orm_lookups]
+                or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(or_, or_queries))
             if not use_distinct:
                 opts = self.bread.model._meta
@@ -346,12 +368,13 @@ class ReadView(BreadViewMixin, DetailView):
     we can iterate over in the template to display it if we don't want
     to make a custom template for this model.
     """
-    perm_name = 'view'  # Default Django permission
-    template_name_suffix = '_read'
+
+    perm_name = "view"  # Default Django permission
+    template_name_suffix = "_read"
 
     def get_context_data(self, **kwargs):
         data = super(ReadView, self).get_context_data(**kwargs)
-        data['form'] = self.get_form(instance=self.object)
+        data["form"] = self.get_form(instance=self.object)
         return data
 
 
@@ -388,14 +411,17 @@ class LabelValueReadView(ReadView):
               (_('Answer'), 42),                    # Mode 5: '42'
               )
     """
-    template_name_suffix = '_label_value_read'
+
+    template_name_suffix = "_label_value_read"
     fields = []
 
     def get_context_data(self, **kwargs):
         context_data = super(LabelValueReadView, self).get_context_data(**kwargs)
 
-        context_data['read_fields'] = [self.get_field_label_value(label, value, context_data) for
-                                       label, value in self.fields]
+        context_data["read_fields"] = [
+            self.get_field_label_value(label, value, context_data)
+            for label, value in self.fields
+        ]
 
         return context_data
 
@@ -404,7 +430,7 @@ class LabelValueReadView(ReadView):
 
         Implements the modes described in the class docstring. (q.v.)
         """
-        value = ''
+        value = ""
         if isinstance(evaluator, str):
             if hasattr(self.object, evaluator):
                 # This is an instance attr or method
@@ -428,8 +454,8 @@ class LabelValueReadView(ReadView):
 
 
 class EditView(BreadViewMixin, UpdateView):
-    perm_name = 'change'  # Default Django permission
-    template_name_suffix = '_edit'
+    perm_name = "change"  # Default Django permission
+    template_name_suffix = "_edit"
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -439,8 +465,8 @@ class EditView(BreadViewMixin, UpdateView):
 
 
 class AddView(BreadViewMixin, CreateView):
-    perm_name = 'add'  # Default Django permission
-    template_name_suffix = '_edit'  # Yes 'edit' not 'add'
+    perm_name = "add"  # Default Django permission
+    template_name_suffix = "_edit"  # Yes 'edit' not 'add'
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
@@ -450,8 +476,8 @@ class AddView(BreadViewMixin, CreateView):
 
 
 class DeleteView(BreadViewMixin, DeleteView):
-    perm_name = 'delete'  # Default Django permission
-    template_name_suffix = '_delete'
+    perm_name = "delete"  # Default Django permission
+    template_name_suffix = "_delete"
 
 
 class Bread(object):
@@ -498,6 +524,7 @@ class Bread(object):
     `{view}` (`browse`, `read`, etc.).
 
     """
+
     browse_view = BrowseView
     read_view = ReadView
     edit_view = EditView
@@ -506,8 +533,8 @@ class Bread(object):
 
     exclude = []  # Names of fields not to show
     views = "BREAD"
-    base_template = setting('DEFAULT_BASE_TEMPLATE', 'base.html')
-    namespace = ''
+    base_template = setting("DEFAULT_BASE_TEMPLATE", "base.html")
+    namespace = ""
     template_name_pattern = None
     plural_name = None
     form_class = None
@@ -517,26 +544,34 @@ class Bread(object):
         self.views = self.views.upper()
 
         if not self.plural_name:
-            self.plural_name = self.name + 's'
+            self.plural_name = self.name + "s"
 
         if not issubclass(self.model, Model):
-            raise TypeError("'model' argument for Bread must be a "
-                            "subclass of Model; it is %r" % self.model)
+            raise TypeError(
+                "'model' argument for Bread must be a "
+                "subclass of Model; it is %r" % self.model
+            )
 
         if self.browse_view.columns:
             for colspec in self.browse_view.columns:
                 column = colspec[1]
                 validate_fieldspec(self.model, column)
 
-        if hasattr(self, 'paginate_by') or hasattr(self, 'columns'):
-            raise ValueError("The 'paginate_by' and 'columns' settings have been moved "
-                             "from the Bread class to the BrowseView class.")
-        if hasattr(self, 'filter'):
-            raise ValueError("The 'filter' setting has been renamed to 'filterset' and moved "
-                             "to the BrowseView.")
-        if hasattr(self, 'filterset'):
-            raise ValueError("The 'filterset' setting should be on the BrowseView, not "
-                             "the Bread view.")
+        if hasattr(self, "paginate_by") or hasattr(self, "columns"):
+            raise ValueError(
+                "The 'paginate_by' and 'columns' settings have been moved "
+                "from the Bread class to the BrowseView class."
+            )
+        if hasattr(self, "filter"):
+            raise ValueError(
+                "The 'filter' setting has been renamed to 'filterset' and moved "
+                "to the BrowseView."
+            )
+        if hasattr(self, "filterset"):
+            raise ValueError(
+                "The 'filterset' setting should be on the BrowseView, not "
+                "the Bread view."
+            )
 
     def get_additional_context_data(self):
         """
@@ -545,13 +580,13 @@ class Bread(object):
         and include the results.
         """
         data = {}
-        data['bread'] = self
+        data["bread"] = self
         # Provide references to useful Model Meta attributes
-        data['verbose_name'] = self.model._meta.verbose_name
-        data['verbose_name_plural'] = self.model._meta.verbose_name_plural
+        data["verbose_name"] = self.model._meta.verbose_name
+        data["verbose_name_plural"] = self.model._meta.verbose_name_plural
 
         # Template that the default bread templates should extend
-        data['base_template'] = self.base_template
+        data["base_template"] = self.base_template
         return data
 
     #####
@@ -559,7 +594,7 @@ class Bread(object):
     #####
     def browse_url_name(self, include_namespace=True):
         """Return the URL name for browsing this model"""
-        return self.get_url_name('browse', include_namespace)
+        return self.get_url_name("browse", include_namespace)
 
     def get_browse_view(self):
         """Return a view method for browsing."""
@@ -573,7 +608,7 @@ class Bread(object):
     # R #
     #####
     def read_url_name(self, include_namespace=True):
-        return self.get_url_name('read', include_namespace)
+        return self.get_url_name("read", include_namespace)
 
     def get_read_view(self):
         return self.read_view.as_view(
@@ -585,7 +620,7 @@ class Bread(object):
     # E #
     #####
     def edit_url_name(self, include_namespace=True):
-        return self.get_url_name('edit', include_namespace)
+        return self.get_url_name("edit", include_namespace)
 
     def get_edit_view(self):
         return self.edit_view.as_view(
@@ -597,7 +632,7 @@ class Bread(object):
     # A #
     #####
     def add_url_name(self, include_namespace=True):
-        return self.get_url_name('add', include_namespace)
+        return self.get_url_name("add", include_namespace)
 
     def get_add_view(self):
         return self.add_view.as_view(
@@ -609,7 +644,7 @@ class Bread(object):
     # D #
     #####
     def delete_url_name(self, include_namespace=True):
-        return self.get_url_name('delete', include_namespace)
+        return self.get_url_name("delete", include_namespace)
 
     def get_delete_view(self):
         return self.delete_view.as_view(
@@ -622,13 +657,13 @@ class Bread(object):
     ##########
     def get_url_name(self, view_name, include_namespace=True):
         if include_namespace:
-            url_namespace = self.namespace + ':' if self.namespace else ''
+            url_namespace = self.namespace + ":" if self.namespace else ""
         else:
-            url_namespace = ''
-        if view_name == 'browse':
-            return '%s%s_%s' % (url_namespace, view_name, self.plural_name)
+            url_namespace = ""
+        if view_name == "browse":
+            return "%s%s_%s" % (url_namespace, view_name, self.plural_name)
         else:
-            return '%s%s_%s' % (url_namespace, view_name, self.name)
+            return "%s%s_%s" % (url_namespace, view_name, self.name)
 
     def get_urls(self, prefix=True):
         """
@@ -656,36 +691,51 @@ class Bread(object):
 
         """
 
-        prefix = '%s/' % self.plural_name if prefix else ''
+        prefix = "%s/" % self.plural_name if prefix else ""
 
         urlpatterns = []
-        if 'B' in self.views:
+        if "B" in self.views:
             urlpatterns.append(
-                path('%s' % prefix,
-                     self.get_browse_view(),
-                     name=self.browse_url_name(include_namespace=False)))
+                path(
+                    "%s" % prefix,
+                    self.get_browse_view(),
+                    name=self.browse_url_name(include_namespace=False),
+                )
+            )
 
-        if 'R' in self.views:
+        if "R" in self.views:
             urlpatterns.append(
-                path('%s<int:pk>/' % prefix,
-                     self.get_read_view(),
-                     name=self.read_url_name(include_namespace=False)))
+                path(
+                    "%s<int:pk>/" % prefix,
+                    self.get_read_view(),
+                    name=self.read_url_name(include_namespace=False),
+                )
+            )
 
-        if 'E' in self.views:
+        if "E" in self.views:
             urlpatterns.append(
-                path('%s<int:pk>/edit/' % prefix,
-                     self.get_edit_view(),
-                     name=self.edit_url_name(include_namespace=False)))
+                path(
+                    "%s<int:pk>/edit/" % prefix,
+                    self.get_edit_view(),
+                    name=self.edit_url_name(include_namespace=False),
+                )
+            )
 
-        if 'A' in self.views:
+        if "A" in self.views:
             urlpatterns.append(
-                path('%sadd/' % prefix,
-                     self.get_add_view(),
-                     name=self.add_url_name(include_namespace=False)))
+                path(
+                    "%sadd/" % prefix,
+                    self.get_add_view(),
+                    name=self.add_url_name(include_namespace=False),
+                )
+            )
 
-        if 'D' in self.views:
+        if "D" in self.views:
             urlpatterns.append(
-                path('%s<int:pk>/delete/' % prefix,
-                     self.get_delete_view(),
-                     name=self.delete_url_name(include_namespace=False)))
+                path(
+                    "%s<int:pk>/delete/" % prefix,
+                    self.get_delete_view(),
+                    name=self.delete_url_name(include_namespace=False),
+                )
+            )
         return urlpatterns

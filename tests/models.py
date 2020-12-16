@@ -14,8 +14,9 @@ from django.db import models
 
 class BreadLabelValueTestModel(models.Model):
     """Model for testing LabelValueReadView, also for GetVerboseNameTest"""
+
     name = models.CharField(max_length=10)
-    banana = models.IntegerField(verbose_name='a yellow fruit', default=0)
+    banana = models.IntegerField(verbose_name="a yellow fruit", default=0)
 
     def name_reversed(self):
         return self.name[::-1]
@@ -23,14 +24,18 @@ class BreadLabelValueTestModel(models.Model):
 
 class BreadTestModel2(models.Model):
     text = models.CharField(max_length=20)
-    label_model = models.OneToOneField(BreadLabelValueTestModel, null=True,
-                                       related_name='model2',
-                                       on_delete=models.CASCADE,
-                                       )
-    model1 = models.OneToOneField('BreadTestModel', null=True,
-                                  related_name='model1',
-                                  on_delete=models.CASCADE,
-                                  )
+    label_model = models.OneToOneField(
+        BreadLabelValueTestModel,
+        null=True,
+        related_name="model2",
+        on_delete=models.CASCADE,
+    )
+    model1 = models.OneToOneField(
+        "BreadTestModel",
+        null=True,
+        related_name="model1",
+        on_delete=models.CASCADE,
+    )
 
     def get_text(self):
         return self.text
@@ -40,17 +45,19 @@ class BreadTestModel(models.Model):
     name = models.CharField(max_length=10)
     age = models.IntegerField()
     other = models.ForeignKey(
-        BreadTestModel2, blank=True, null=True,
+        BreadTestModel2,
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
     )
 
     class Meta:
         ordering = [
-            'name',
-            '-age',  # If same name, sort oldest first
+            "name",
+            "-age",  # If same name, sort oldest first
         ]
         permissions = [
-            ('browse_breadtestmodel', 'can browse BreadTestModel'),
+            ("browse_breadtestmodel", "can browse BreadTestModel"),
         ]
 
     def __str__(self):

@@ -2,33 +2,32 @@
 import logging
 import sys
 
-from django.conf import settings
 from django import setup
+from django.conf import settings
 from django.test.utils import get_runner
-
 
 if not settings.configured:
     settings.configure(
         DATABASES={
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': ':memory:',
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": ":memory:",
             }
         },
         MIDDLEWARE_CLASSES=(),
         INSTALLED_APPS=(
-            'bread',
-            'tests',
+            "bread",
+            "tests",
             "django.contrib.auth",
             "django.contrib.contenttypes",
-            'django.contrib.sessions',
+            "django.contrib.sessions",
         ),
         SITE_ID=1,
-        SECRET_KEY='super-secret',
+        SECRET_KEY="super-secret",
         TEMPLATES=[
             {
-                "BACKEND": 'django.template.backends.django.DjangoTemplates',
-                "DIRS": ['bread/templates'],
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": ["bread/templates"],
             }
         ],
     )
@@ -47,5 +46,5 @@ def runtests():
     sys.exit(failures)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     runtests()
