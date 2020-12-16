@@ -3,6 +3,13 @@
 Change Log
 ==========
 
+1.0.2 - Dec 16, 2020
+--------------------
+
+* Switch from Travis to Github Actions. There are no functional
+  changes in the package, but I'm using this release to test the
+  Github Actions release workflow.
+
 1.0.1 - Dec 2, 2020
 -------------------
 
