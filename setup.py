@@ -30,8 +30,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Framework :: Django :: 2.2",
-        "Framework :: Django :: 3.0",
-        "Framework :: Django :: 3.1",
+        "Framework :: Django :: 3.2",
     ],
     zip_safe=False,  # because we're including media that Django needs
 )

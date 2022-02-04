@@ -49,10 +49,8 @@ class BreadTestCase(TestCase):
             columns = [
                 ("Name", "name"),
                 ("Text", "other__text"),
-                (
-                    "Model1",
-                    "model1",
-                ),
+                ("Model1", "model1"),
+                ("Roundabout Name", "get_name"),
             ]
 
         class BreadTestClass(Bread):
