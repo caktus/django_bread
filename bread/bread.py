@@ -208,9 +208,10 @@ class BrowseView(BreadViewMixin, ListView):
         for i in range(len(self.columns)):
             fieldspec = self.get_sort_field_name_for_column(i)
             if fieldspec:
-                queryset = self.model.objects.order_by(fieldspec)
                 try:
-                    # Force Django to build the query so it will validate the order_by args
+                    # In Django 3.1.13+, order_by args are validated here
+                    queryset = self.model.objects.order_by(fieldspec)
+                    # Force Django < 3.1.13 to build the query here so it will validate the order_by args
                     str(queryset.query)
                 except FieldError:
                     pass

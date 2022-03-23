@@ -30,6 +30,7 @@ if not settings.configured:
                 "DIRS": ["bread/templates"],
             }
         ],
+        DEFAULT_AUTO_FIELD="django.db.models.AutoField",
     )
 
 
