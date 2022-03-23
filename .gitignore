@@ -5,3 +5,5 @@ dist
 _build
 *.egg-info/
 .coverage
+.envrc
+.direnv
