@@ -135,6 +135,9 @@ class ValidateFieldspecTestCase(TestCase):
         with self.assertRaises(ValidationError):
             validate_fieldspec(BreadTestModel, "other__petunias")
 
+    def test_reverse_one_to_one_rel(self):
+        validate_fieldspec(BreadLabelValueTestModel, "model2__text")
+
 
 class GetVerboseNameTest(TestCase):
     """Exercise get_verbose_name()"""
