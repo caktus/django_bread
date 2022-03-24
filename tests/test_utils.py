@@ -92,7 +92,8 @@ class HasRequiredArgsTestCase(TestCase):
 
 class GetModelFieldTestCase(TestCase):
     def test_it(self):
-        obj2 = BreadTestModel2.objects.create(text="Rhinocerous")
+        obj3 = BreadLabelValueTestModel.objects.create(name="Species")
+        obj2 = BreadTestModel2.objects.create(text="Rhinocerous", label_model=obj3)
         obj1 = BreadTestModel.objects.create(name="Rudy Vallee", other=obj2, age=72)
         self.assertEqual(obj1.name, get_model_field(obj1, "name"))
         self.assertEqual(obj1.name, get_model_field(obj1, "get_name"))
@@ -102,6 +103,9 @@ class GetModelFieldTestCase(TestCase):
 
         # Prove that we can call a dunder method.
         self.assertEqual(obj1.name, get_model_field(obj1, "__str__"))
+
+        # Prove that we can traverse reverse OneToOneRel fields
+        self.assertEqual(obj2.text, get_model_field(obj3, "model2__text"))
 
 
 class ValidateFieldspecTestCase(TestCase):
