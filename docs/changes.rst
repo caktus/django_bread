@@ -3,6 +3,11 @@
 Change Log
 ==========
 
+1.0.4 - Mar 24, 2022
+--------------------
+
+* Add support for traversing reverse ``OneToOneRel`` fields
+
 1.0.3 - Mar 23, 2022
 --------------------
 
