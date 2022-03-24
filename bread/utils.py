@@ -33,6 +33,7 @@ import inspect
 from django.core.exceptions import FieldDoesNotExist, ValidationError
 from django.db.models import Model
 from django.db.models.fields.related import RelatedField
+from django.db.models.fields.reverse_related import OneToOneRel
 
 
 def get_value_or_result(model_instance, attribute_name):
@@ -158,7 +159,7 @@ def validate_fieldspec(model, spec):
     else:
         # It's a field
         # Is it a key?
-        if isinstance(field, RelatedField):
+        if isinstance(field, RelatedField) or isinstance(field, OneToOneRel):
             # Yes, refers to another model
             if rest_of_spec:
                 # Recurse!
