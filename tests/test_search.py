@@ -81,10 +81,10 @@ class BreadSearchTestCase(BreadTestCase):
 
     def test_nonascii_search(self):
         # This was failing if we were also paginating
-        BreadTestModelFactory(name=u"قمر")
-        BreadTestModelFactory(name=u"قمر")
+        BreadTestModelFactory(name="قمر")
+        BreadTestModelFactory(name="قمر")
         try:
             self.bread.browse_view.paginate_by = 1
-            self.get_search_results(q=u"قمر")
+            self.get_search_results(q="قمر")
         finally:
             self.bread.browse_view.paginate_by = None

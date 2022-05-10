@@ -173,7 +173,7 @@ class GetVerboseNameTest(TestCase):
         """Ensure FieldDoesNotExist is raised no matter what trash is passed as the field name"""
         for field_name in (
             "kjasfhkjdh",
-            u"sfasfda",
+            "sfasfda",
             None,
             42,
             False,
