@@ -19,6 +19,7 @@ from django.db.models import Model, Q
 from django.forms.models import modelform_factory
 from django.http.response import HttpResponseBadRequest
 from django.urls import path, reverse_lazy
+from django.utils.html import escape
 from vanilla import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .utils import get_verbose_name, validate_fieldspec
@@ -114,7 +115,7 @@ class BreadViewMixin(object):
         try:
             return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
         except Http400 as e:
-            return HttpResponseBadRequest(content=e.msg.encode("utf-8"))
+            return HttpResponseBadRequest(content=escape(e.msg).encode("utf-8"))
 
     def get_template_names(self):
         """Return Django Vanilla templates (app-specific), then
