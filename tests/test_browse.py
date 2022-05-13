@@ -259,6 +259,17 @@ class BadSortTest(BreadTestCase):
         rsp = self.bread.get_browse_view()(request)
         self.assertEqual(400, rsp.status_code)
 
+    def test_html_injection(self):
+        """Bad user queryparam input should be escaped in error messages."""
+        self.set_urls(self.bread)
+        BreadTestModelFactory(name="1", other__text="111")
+        self.give_permission("browse")
+        url = reverse(self.bread.get_url_name("browse")) + "?o=<h1>hello</h1>"
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertNotContains(rsp, "<h1>hello</h1>", status_code=400, html=True)
+
 
 class NotDisablingSortTest(BreadTestCase):
     class BrowseClass(BrowseView):

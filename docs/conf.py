@@ -47,9 +47,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Django Bread"
-copyright = u"2015, Caktus Consulting, LLC"
-author = u"Caktus Consulting, LLC"
+project = "Django Bread"
+copyright = "2015, Caktus Consulting, LLC"
+author = "Caktus Consulting, LLC"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -223,8 +223,8 @@ latex_documents = [
     (
         master_doc,
         "DjangoBread.tex",
-        u"Django Bread Documentation",
-        u"Caktus Consulting, LLC",
+        "Django Bread Documentation",
+        "Caktus Consulting, LLC",
         "manual",
     ),
 ]
@@ -254,7 +254,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "djangobread", u"Django Bread Documentation", [author], 1)]
+man_pages = [(master_doc, "djangobread", "Django Bread Documentation", [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -269,7 +269,7 @@ texinfo_documents = [
     (
         master_doc,
         "DjangoBread",
-        u"Django Bread Documentation",
+        "Django Bread Documentation",
         author,
         "DjangoBread",
         "One line description of project.",
