@@ -188,6 +188,10 @@ class BreadViewMixin(object):
 # The individual view classes we'll use and customize in the
 # omnibus class below:
 class BrowseView(BreadViewMixin, ListView):
+    # Include in any colspec to allow Django ORM annotations.
+    # Will skip init-time validation for that column.
+    is_annotation = object()
+
     # Configurable:
     columns = []
     filterset = None  # Class
@@ -211,7 +215,9 @@ class BrowseView(BreadViewMixin, ListView):
             if fieldspec:
                 try:
                     # In Django 3.1.13+, order_by args are validated here
-                    queryset = self.model.objects.order_by(fieldspec)
+                    queryset = (
+                        super(BrowseView, self).get_queryset().order_by(fieldspec)
+                    )
                     # Force Django < 3.1.13 to build the query here so it will validate the order_by args
                     str(queryset.query)
                 except FieldError:
@@ -556,6 +562,10 @@ class Bread(object):
 
         if self.browse_view.columns:
             for colspec in self.browse_view.columns:
+                if any(entry == self.browse_view.is_annotation for entry in colspec):
+                    # this column renders an annotation which is not present on the
+                    # model class until querytime.
+                    continue
                 column = colspec[1]
                 validate_fieldspec(self.model, column)
 
