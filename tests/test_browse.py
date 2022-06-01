@@ -1,9 +1,11 @@
 import json
 from unittest.mock import patch
 
+from django.db.models.functions import Upper
 from django.urls import reverse
 
 from bread.bread import BrowseView
+from tests.models import BreadTestModel
 
 from .base import BreadTestCase
 from .factories import BreadTestModelFactory
@@ -317,3 +319,61 @@ class DisableSortTest(BreadTestCase):
         self.assertEqual(200, rsp.status_code)
         rsp.render()
         self.assertEqual([], json.loads(rsp.context_data["valid_sorting_columns_json"]))
+
+
+class AnnotationsBrowseTest(BreadTestCase):
+    class BrowseClass(BrowseView):
+        queryset = BreadTestModel.objects.annotate(loud_name=Upper("name"))
+        columns = [
+            ("Name", "name"),
+            ("Loud Name", "loud_name", BrowseView.is_annotation, "loud_name"),
+        ]
+
+    extra_bread_attributes = {
+        "browse_view": BrowseClass,
+    }
+
+    def test_rendering_annotation(self):
+        self.set_urls(self.bread)
+        items = [BreadTestModelFactory() for __ in range(5)]
+        self.assertTrue(
+            any(item for item in items if item.name != item.name.upper()),
+            "all item names already uppercase, this test will not be meaningful",
+        )
+        self.give_permission("browse")
+
+        url = reverse(self.bread.get_url_name("browse"))
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertEqual(200, rsp.status_code)
+
+        rsp.render()
+        body = rsp.content.decode("utf-8")
+        for item in items:
+            self.assertIn(item.name, body)
+            self.assertIn(item.name.upper(), body)
+
+    def test_sort_by_annotation(self):
+        self.set_urls(self.bread)
+        self.give_permission("browse")
+        d = BreadTestModelFactory(name="denise")
+        a = BreadTestModelFactory(name="alice")
+        e = BreadTestModelFactory(name="elise")
+        b = BreadTestModelFactory(name="bernice")
+        c = BreadTestModelFactory(name="clarice")
+
+        url = reverse(self.bread.get_url_name("browse")) + "?o=1"
+        request = self.request_factory.get(url)
+        request.user = self.user
+        rsp = self.bread.get_browse_view()(request)
+        self.assertEqual(200, rsp.status_code)
+
+        rsp.render()
+        self.assertListEqual(
+            [0, 1],
+            json.loads(rsp.context_data["valid_sorting_columns_json"]),
+            "bread did not consider our annotation column sortable",
+        )
+        results = rsp.context_data["object_list"]
+        self.assertListEqual([a, b, c, d, e], list(results), "results were not sorted")
