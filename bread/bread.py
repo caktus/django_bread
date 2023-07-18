@@ -366,15 +366,15 @@ class BrowseView(BreadViewMixin, ListView):
                     # to lookup_spawns_duplicates() in Django 4.0
                     # https://docs.djangoproject.com/en/4.2/releases/4.0/#:~:text=The%20undocumented%20django.contrib.admin.utils.lookup_needs_distinct()%20function%20is%20renamed%20to%20lookup_spawns_duplicates().
                     try:
-                        from django.contrib.admin.utils import lookup_needs_distinct
-
-                        if lookup_needs_distinct(opts, search_spec):
-                            use_distinct = True
-                            break
-                    except ImportError:
                         from django.contrib.admin.utils import lookup_spawns_duplicates
 
                         if lookup_spawns_duplicates(opts, search_spec):
+                            use_distinct = True
+                            break
+                    except ImportError:
+                        from django.contrib.admin.utils import lookup_needs_distinct
+
+                        if lookup_needs_distinct(opts, search_spec):
                             use_distinct = True
                             break
 
