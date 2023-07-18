@@ -28,9 +28,3 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
-
-  - repo: https://github.com/adamchainz/django-upgrade
-    rev: "1.14.0"
-    hooks:
-      - id: django-upgrade
-        args: [--target-version, "4.2"]
