@@ -28,8 +28,8 @@ Django 2.0 has been out of support since April 1, 2019.)
 Supported versions
 ------------------
 
-Django: 2.2, 3.2
-Python: 3.7, 3.8, 3.9, 3.10
+Django: 3.2, 4.2
+Python: 3.8, 3.9, 3.10
 
 For Python 2.7 and/or Django 1.11 support, the 0.5 release series is identical (features-wise)
 to 0.6 and is available on PyPI: https://pypi.org/project/django-bread/#history

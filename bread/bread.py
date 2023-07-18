@@ -4,7 +4,6 @@ from operator import or_
 from urllib.parse import urlencode
 
 from django.conf import settings
-from django.contrib.admin.utils import lookup_needs_distinct
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Permission
 from django.contrib.auth.views import redirect_to_login
@@ -339,6 +338,7 @@ class BrowseView(BreadViewMixin, ListView):
         Returns a tuple containing a queryset to implement the search,
         and a boolean indicating if the results may contain duplicates.
         """
+
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
@@ -362,9 +362,21 @@ class BrowseView(BreadViewMixin, ListView):
             if not use_distinct:
                 opts = self.bread.model._meta
                 for search_spec in orm_lookups:
-                    if lookup_needs_distinct(opts, search_spec):
-                        use_distinct = True
-                        break
+                    # The function lookup_needs_distinct() was renamed
+                    # to lookup_spawns_duplicates() in Django 4.0
+                    # https://docs.djangoproject.com/en/4.2/releases/4.0/#:~:text=The%20undocumented%20django.contrib.admin.utils.lookup_needs_distinct()%20function%20is%20renamed%20to%20lookup_spawns_duplicates().
+                    try:
+                        from django.contrib.admin.utils import lookup_needs_distinct
+
+                        if lookup_needs_distinct(opts, search_spec):
+                            use_distinct = True
+                            break
+                    except ImportError:
+                        from django.contrib.admin.utils import lookup_spawns_duplicates
+
+                        if lookup_spawns_duplicates(opts, search_spec):
+                            use_distinct = True
+                            break
 
         return queryset, use_distinct
 
