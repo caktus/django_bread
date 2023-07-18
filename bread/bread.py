@@ -372,9 +372,9 @@ class BrowseView(BreadViewMixin, ListView):
                             use_distinct = True
                             break
                     except ImportError:
-                        from django.contrib.admin.utils import lookup_needs_distinct
+                        from django.contrib.admin.utils import lookup_spawns_duplicates
 
-                        if lookup_needs_distinct(opts, search_spec):
+                        if lookup_spawns_duplicates(opts, search_spec):
                             use_distinct = True
                             break
 
