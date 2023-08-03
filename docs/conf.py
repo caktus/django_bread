@@ -48,7 +48,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Django Bread"
-copyright = "2015, Caktus Consulting, LLC"
+copyright = "2015-2023, Caktus Consulting, LLC"
 author = "Caktus Consulting, LLC"
 
 # The version info for the project you're documenting, acts as replacement for

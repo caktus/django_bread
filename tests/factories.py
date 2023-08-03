@@ -1,24 +1,26 @@
 import factory
-import factory.fuzzy
 
 from .models import BreadLabelValueTestModel, BreadTestModel, BreadTestModel2
 
 
-class BreadTestModel2Factory(factory.DjangoModelFactory):
-    FACTORY_FOR = BreadTestModel2
+class BreadTestModel2Factory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BreadTestModel2
 
-    text = factory.fuzzy.FuzzyText(length=10)
+    text = factory.Faker("text", max_nb_chars=10)
 
 
-class BreadTestModelFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = BreadTestModel
+class BreadTestModelFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BreadTestModel
 
-    name = factory.fuzzy.FuzzyText(length=10)
-    age = factory.fuzzy.FuzzyInteger(low=1, high=99)
+    name = factory.Faker("name")
+    age = factory.Faker("pyint", min_value=0, max_value=99)
     other = factory.SubFactory(BreadTestModel2Factory)
 
 
-class BreadLabelValueTestModelFactory(factory.DjangoModelFactory):
-    FACTORY_FOR = BreadLabelValueTestModel
+class BreadLabelValueTestModelFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = BreadLabelValueTestModel
 
-    name = factory.fuzzy.FuzzyText(length=10)
+    name = factory.Faker("name")
