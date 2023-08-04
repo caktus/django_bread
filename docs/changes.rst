@@ -3,6 +3,13 @@
 Change Log
 ==========
 
+1.0.5 - Aug 3, 2023
+--------------------
+
+* Add support for Django 4.x and removes support for deprecated versions
+* Remove support for Python 3.7
+
+
 1.0.4 - Mar 24, 2022
 --------------------
 
