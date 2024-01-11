@@ -299,7 +299,7 @@ class BrowseView(BreadViewMixin, ListView):
 
         # Now filter
         if self.filterset is not None:
-            self.filter = self.filterset(query_parms, queryset=qset)
+            self.filter = self.filterset(query_parms, queryset=qset, request=self.request)
             qset = self.filter.qs
 
         return qset
