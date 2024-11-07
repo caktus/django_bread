@@ -61,7 +61,7 @@ class BreadTestCase(TestCase):
             plural_name = "testmodels"
 
             def get_additional_context_data(self):
-                context = super(BreadTestClass, self).get_additional_context_data()
+                context = super().get_additional_context_data()
                 context["bread_test_class"] = True
                 return context
 
@@ -86,7 +86,7 @@ class BreadTestCase(TestCase):
         """
         return Permission.objects.get_or_create(
             content_type=ContentType.objects.get_for_model(self.model),
-            codename="%s_%s" % (short_name, self.model_name),
+            codename=f"{short_name}_{self.model_name}",
         )[0]
 
     def give_permission(self, short_name):

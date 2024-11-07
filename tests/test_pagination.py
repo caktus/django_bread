@@ -15,7 +15,7 @@ class BreadPaginationTest(BreadTestCase):
     extra_bread_attributes = {"browse_view": BrowseTestView}
 
     def setUp(self):
-        super(BreadPaginationTest, self).setUp()
+        super().setUp()
         [self.model_factory() for __ in range(2 * PAGE_SIZE + 1)]
         self.set_urls(self.bread)
         self.give_permission("browse")

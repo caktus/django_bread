@@ -80,7 +80,7 @@ def get_verbose_name(an_object, field_name, title_cap=True):
     except TypeError:
         # TypeError happens if the caller is very confused and passes an unhashable type such
         # as {} or []. I convert that into a FieldDoesNotExist exception for simplicity.
-        raise FieldDoesNotExist("No field named {}".format(str(field_name)))
+        raise FieldDoesNotExist(f"No field named {str(field_name)}")
 
     verbose_name = field.verbose_name
 

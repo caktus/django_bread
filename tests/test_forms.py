@@ -26,7 +26,7 @@ class BreadFormAddTest(BreadTestCase):
     }
 
     def setUp(self):
-        super(BreadFormAddTest, self).setUp()
+        super().setUp()
         self.set_urls(self.bread)
 
     def test_new_item(self):
@@ -80,7 +80,7 @@ class BreadFormEditTest(BreadTestCase):
     }
 
     def setUp(self):
-        super(BreadFormEditTest, self).setUp()
+        super().setUp()
         self.set_urls(self.bread)
 
     def test_edit_item(self):
@@ -135,7 +135,7 @@ class BreadExcludeTest(BreadTestCase):
     extra_bread_attributes = {"exclude": ["id"]}
 
     def setUp(self):
-        super(BreadExcludeTest, self).setUp()
+        super().setUp()
         self.set_urls(self.bread)
 
     def test_get(self):

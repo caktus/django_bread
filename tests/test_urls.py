@@ -10,16 +10,14 @@ class BreadURLsNamespaceTest(BreadTestCase):
         patterns = bread.get_urls()
 
         self.assertEqual(
-            set(
-                [
-                    bread.browse_url_name(include_namespace=False),
-                    bread.read_url_name(include_namespace=False),
-                    bread.edit_url_name(include_namespace=False),
-                    bread.add_url_name(include_namespace=False),
-                    bread.delete_url_name(include_namespace=False),
-                ]
-            ),
-            set([x.name for x in patterns]),
+            {
+                bread.browse_url_name(include_namespace=False),
+                bread.read_url_name(include_namespace=False),
+                bread.edit_url_name(include_namespace=False),
+                bread.add_url_name(include_namespace=False),
+                bread.delete_url_name(include_namespace=False),
+            },
+            {x.name for x in patterns},
         )
 
         self.assertTrue(bread.browse_url_name().startswith(self.url_namespace + ":"))
@@ -84,16 +82,14 @@ class BreadURLsTest(BreadTestCase):
         patterns = bread.get_urls()
 
         self.assertEqual(
-            set(
-                [
-                    bread.browse_url_name(),
-                    bread.read_url_name(),
-                    bread.edit_url_name(),
-                    bread.add_url_name(),
-                    bread.delete_url_name(),
-                ]
-            ),
-            set([x.name for x in patterns]),
+            {
+                bread.browse_url_name(),
+                bread.read_url_name(),
+                bread.edit_url_name(),
+                bread.add_url_name(),
+                bread.delete_url_name(),
+            },
+            {x.name for x in patterns},
         )
 
         browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][
@@ -143,16 +139,14 @@ class BreadURLsTest(BreadTestCase):
         patterns = bread.get_urls(prefix=False)
 
         self.assertEqual(
-            set(
-                [
-                    bread.browse_url_name(),
-                    bread.read_url_name(),
-                    bread.edit_url_name(),
-                    bread.add_url_name(),
-                    bread.delete_url_name(),
-                ]
-            ),
-            set([x.name for x in patterns]),
+            {
+                bread.browse_url_name(),
+                bread.read_url_name(),
+                bread.edit_url_name(),
+                bread.add_url_name(),
+                bread.delete_url_name(),
+            },
+            {x.name for x in patterns},
         )
 
         browse_pattern = [x for x in patterns if x.name == bread.browse_url_name()][

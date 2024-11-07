@@ -1,6 +1,6 @@
 . # <- install ourselves
 coverage
-django>=3.2,<4.0
+django>=4.2,<5.2
 factory_boy==3.2.1
 flake8
 pre-commit

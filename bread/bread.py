@@ -45,7 +45,7 @@ def setting(name, default=None):
     return BREAD.get(name, default)
 
 
-class BreadViewMixin(object):
+class BreadViewMixin:
     """We mix this into all the views for some common features"""
 
     bread = None  # The Bread object using this view
@@ -69,8 +69,8 @@ class BreadViewMixin(object):
 
     def __init__(self, *args, **kwargs):
         # Make sure the permission needed to use this view exists.
-        super(BreadViewMixin, self).__init__(*args, **kwargs)
-        perm_name = "%s_%s" % (
+        super().__init__(*args, **kwargs)
+        perm_name = "{}_{}".format(
             self.perm_name,
             self.bread.model._meta.object_name.lower(),
         )
@@ -112,7 +112,7 @@ class BreadViewMixin(object):
             raise PermissionDenied  # return a forbidden response.
 
         try:
-            return super(BreadViewMixin, self).dispatch(request, *args, **kwargs)
+            return super().dispatch(request, *args, **kwargs)
         except Http400 as e:
             return HttpResponseBadRequest(content=escape(e.msg).encode("utf-8"))
 
@@ -121,7 +121,7 @@ class BreadViewMixin(object):
         Customized template via Bread object, then
         Django Bread template
         """
-        vanilla_templates = super(BreadViewMixin, self).get_template_names()
+        vanilla_templates = super().get_template_names()
 
         # template_name_suffix may have a leading underscore (to make it work well with Django
         # Vanilla Views). If it does, then we strip the underscore to get our 'view' name.
@@ -145,7 +145,7 @@ class BreadViewMixin(object):
         return self.request.path + "?" + urlencode(request_kwargs, doseq=True)
 
     def get_context_data(self, **kwargs):
-        data = super(BreadViewMixin, self).get_context_data(**kwargs)
+        data = super().get_context_data(**kwargs)
 
         # Add data from the Bread object
         data.update(self.bread.get_additional_context_data())
@@ -203,7 +203,7 @@ class BrowseView(BreadViewMixin, ListView):
     _valid_sorting_columns = []  # indices of columns that are valid in ordering parms
 
     def __init__(self, *args, **kwargs):
-        super(BrowseView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Internal use
         self.filter = None
 
@@ -214,9 +214,7 @@ class BrowseView(BreadViewMixin, ListView):
             if fieldspec:
                 try:
                     # In Django 3.1.13+, order_by args are validated here
-                    queryset = (
-                        super(BrowseView, self).get_queryset().order_by(fieldspec)
-                    )
+                    queryset = super().get_queryset().order_by(fieldspec)
                     # Force Django < 3.1.13 to build the query here so it will validate the order_by args
                     str(queryset.query)
                 except FieldError:
@@ -234,7 +232,7 @@ class BrowseView(BreadViewMixin, ListView):
         return sortspec() if callable(sortspec) else sortspec
 
     def get_queryset(self):
-        qset = super(BrowseView, self).get_queryset()
+        qset = super().get_queryset()
 
         # Make a copy of the query parms. We need to remove the
         # sorting and search parms from this as we process them,
@@ -263,7 +261,9 @@ class BrowseView(BreadViewMixin, ListView):
                     column_number = int(o_field)
                 except ValueError:
                     raise Http400(
-                        "%s is not a valid integer in sorting param o=%r" % (o_field, o)
+                        "{} is not a valid integer in sorting param o={!r}".format(
+                            o_field, o
+                        )
                     )
                 if column_number not in self._valid_sorting_columns:
                     raise Http400(
@@ -299,13 +299,15 @@ class BrowseView(BreadViewMixin, ListView):
 
         # Now filter
         if self.filterset is not None:
-            self.filter = self.filterset(query_parms, queryset=qset, request=self.request)
+            self.filter = self.filterset(
+                query_parms, queryset=qset, request=self.request
+            )
             qset = self.filter.qs
 
         return qset
 
     def get_context_data(self, **kwargs):
-        data = super(BrowseView, self).get_context_data(**kwargs)
+        data = super().get_context_data(**kwargs)
         data["o"] = self.request.GET.get("o", "")
         data["q"] = self.request.GET.get("q", "")
         data["columns"] = self.columns
@@ -372,9 +374,9 @@ class BrowseView(BreadViewMixin, ListView):
                             use_distinct = True
                             break
                     except ImportError:
-                        from django.contrib.admin.utils import lookup_needs_distinct
+                        from django.contrib.admin.utils import lookup_spawns_duplicates
 
-                        if lookup_needs_distinct(opts, search_spec):
+                        if lookup_spawns_duplicates(opts, search_spec):
                             use_distinct = True
                             break
 
@@ -393,7 +395,7 @@ class ReadView(BreadViewMixin, DetailView):
     template_name_suffix = "_read"
 
     def get_context_data(self, **kwargs):
-        data = super(ReadView, self).get_context_data(**kwargs)
+        data = super().get_context_data(**kwargs)
         data["form"] = self.get_form(instance=self.object)
         return data
 
@@ -436,7 +438,7 @@ class LabelValueReadView(ReadView):
     fields = []
 
     def get_context_data(self, **kwargs):
-        context_data = super(LabelValueReadView, self).get_context_data(**kwargs)
+        context_data = super().get_context_data(**kwargs)
 
         context_data["read_fields"] = [
             self.get_field_label_value(label, value, context_data)
@@ -479,7 +481,7 @@ class EditView(BreadViewMixin, UpdateView):
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
-        rsp = super(EditView, self).form_invalid(form)
+        rsp = super().form_invalid(form)
         rsp.status_code = 400
         return rsp
 
@@ -490,7 +492,7 @@ class AddView(BreadViewMixin, CreateView):
 
     def form_invalid(self, form):
         # Return a 400 if the form isn't valid
-        rsp = super(AddView, self).form_invalid(form)
+        rsp = super().form_invalid(form)
         rsp.status_code = 400
         return rsp
 
@@ -500,7 +502,7 @@ class DeleteView(BreadViewMixin, DeleteView):
     template_name_suffix = "_delete"
 
 
-class Bread(object):
+class Bread:
     """
     Provide a set of BREAD views for a model.
 
@@ -685,9 +687,9 @@ class Bread(object):
         else:
             url_namespace = ""
         if view_name == "browse":
-            return "%s%s_%s" % (url_namespace, view_name, self.plural_name)
+            return f"{url_namespace}{view_name}_{self.plural_name}"
         else:
-            return "%s%s_%s" % (url_namespace, view_name, self.name)
+            return f"{url_namespace}{view_name}_{self.name}"
 
     def get_urls(self, prefix=True):
         """

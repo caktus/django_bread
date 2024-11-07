@@ -48,42 +48,42 @@ class HasRequiredArgsTestCase(TestCase):
         self.assertFalse(has_required_args(testfunc))
 
     def test_class_function_no_args(self):
-        class TestClass(object):
+        class TestClass:
             def func(self):
                 pass
 
         self.assertFalse(has_required_args(TestClass.func))
 
     def test_class_function_1_arg(self):
-        class TestClass(object):
+        class TestClass:
             def func(self, foo):
                 pass
 
         self.assertTrue(has_required_args(TestClass.func))
 
     def test_class_function_1_arg_with_default(self):
-        class TestClass(object):
+        class TestClass:
             def func(self, foo=2):
                 pass
 
         self.assertFalse(has_required_args(TestClass.func))
 
     def test_class_function_2_args(self):
-        class TestClass(object):
+        class TestClass:
             def func(self, foo, bar):
                 pass
 
         self.assertTrue(has_required_args(TestClass.func))
 
     def test_class_function_2_args_1_default(self):
-        class TestClass(object):
+        class TestClass:
             def func(self, foo, bar=2):
                 pass
 
         self.assertTrue(has_required_args(TestClass.func))
 
     def test_class_function_2_args_2_defaults(self):
-        class TestClass(object):
+        class TestClass:
             def func(self, foo=1, bar=2):
                 pass
 

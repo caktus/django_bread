@@ -6,7 +6,7 @@ from .base import BreadTestCase
 
 class BreadDeleteTest(BreadTestCase):
     def setUp(self):
-        super(BreadDeleteTest, self).setUp()
+        super().setUp()
         self.set_urls(self.bread)
 
     def test_delete_item(self):

@@ -11,7 +11,7 @@ from .models import BreadLabelValueTestModel, BreadTestModel
 
 class BreadReadTest(BreadTestCase):
     def setUp(self):
-        super(BreadReadTest, self).setUp()
+        super().setUp()
         self.urlconf = "bread.tests.test_read"
         self.give_permission("view")
         self.set_urls(self.bread)
@@ -56,7 +56,7 @@ class BreadLabelValueReadTest(BreadTestCase):
     """Exercise LabelValueReadView, particularly the 5 modes described in get_field_label_value()"""
 
     def setUp(self):
-        super(BreadLabelValueReadTest, self).setUp()
+        super().setUp()
 
         class ReadClass(LabelValueReadView):
             """See LabelValueReadView.get_field_label_value() for descriptions of the modes"""
@@ -109,7 +109,7 @@ class BreadLabelValueReadTest(BreadTestCase):
         # TestLabelValueBreadReadView.
         key = sorted(rsp.context_data.keys())[0]
         for expected in (
-            "<label>Id</label>: <span class='value'>{}</span>".format(item.id),
+            f"<label>Id</label>: <span class='value'>{item.id}</span>",
             "<label>A Yellow Fruit</label>: <span class='value'>0</span>",
             "<label>eman</label>: <span class='value'>edcba</span>",
             "<label>Foo</label>: <span class='value'>bar</span>",

@@ -22,4 +22,4 @@ def getter(value, arg):
     except ObjectDoesNotExist:
         pass
     except Exception:
-        logger.exception("Something blew up: %s|getter:%s" % (value, arg))
+        logger.exception(f"Something blew up: {value}|getter: {arg}")

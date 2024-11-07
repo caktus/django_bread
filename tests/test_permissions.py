@@ -8,13 +8,13 @@ from django.urls import reverse
 from .base import BreadTestCase
 
 
-class BreadPermissionTestMixin(object):
+class BreadPermissionTestMixin:
     # Just a mixin so these test methods don't try to run on
     # a parent testcase class
     include_post = False
 
     def setUp(self):
-        super(BreadPermissionTestMixin, self).setUp()
+        super().setUp()
 
         self.set_urls(self.bread)
 
@@ -39,7 +39,7 @@ class BreadPermissionTestMixin(object):
         # but we get redirected rather than PermissionDenied
         self.request.user = AnonymousUser()
         rsp = self.view(self.request, pk=self.item.pk)
-        expected_url = "%s?%s=%s" % (
+        expected_url = "{}?{}={}".format(
             settings.LOGIN_URL,
             REDIRECT_FIELD_NAME,
             self.request.path,

@@ -9,7 +9,7 @@ from .models import BreadTestModel
 
 class BreadEditTest(BreadTestCase):
     def setUp(self):
-        super(BreadEditTest, self).setUp()
+        super().setUp()
         self.set_urls(self.bread)
 
     def test_edit_item(self):

@@ -1,4 +1,3 @@
-# coding: utf-8
 from bread.bread import Bread, BrowseView
 from tests.base import BreadTestCase
 from tests.factories import BreadTestModelFactory
@@ -26,7 +25,7 @@ class BreadNoSearchView(Bread):
 
 class BreadSearchTestCase(BreadTestCase):
     def setUp(self):
-        super(BreadSearchTestCase, self).setUp()
+        super().setUp()
         self.bread = BreadSearchView()
         self.view = self.bread.get_browse_view()
         self.give_permission("browse")
