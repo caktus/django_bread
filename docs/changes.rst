@@ -5,6 +5,14 @@
 Change Log
 ==========
 
+1.0.7 - Nov 7, 2024
+-------------------
+
+* Add support for Django 5.x and removes support for deprecated versions
+* Add support for Python 3.11 and 3.12
+* Remove support for Python 3.8
+
+
 1.0.6 - Jan 22, 2024
 --------------------
 
