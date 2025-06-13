@@ -10,6 +10,11 @@ pagination, and more.
 This is relatively stable. We're using it in production and have attempted
 to document the important parts, but feedback is welcome.
 
+Documentation
+-------------
+
+The documentation is available at https://django-bread.readthedocs.io/
+
 Breaking change in 1.0.0
 ------------------------
 
